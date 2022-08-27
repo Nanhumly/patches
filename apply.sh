@@ -18,9 +18,9 @@ for project in $(cd $patches/patches/$tree; echo *);do
 done
 }
 
-if [ $1 = arrow ];then
+if [ $1 = kscope ];then
 echo ""
-echo "Adapt ArrowOS to Sagit"
+echo "Adapt KaleidoscopeOS to Sagit"
 echo "Executing in 5 seconds - CTRL-C to exit"
 echo ""
 fi

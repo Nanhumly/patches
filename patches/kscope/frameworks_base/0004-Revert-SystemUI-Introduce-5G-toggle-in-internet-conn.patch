@@ -1,0 +1,377 @@
+From 66857ad59155c2ce5a03f217aa08d39875ea6bd9 Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Wed, 20 Jul 2022 14:08:15 +0000
+Subject: [PATCH] Revert "SystemUI: Introduce 5G toggle in internet
+ connectivity dialog"
+
+This reverts commit 841a8317064e0332de25157fd9317401c822e54b.
+---
+ .../layout/internet_connectivity_dialog.xml   | 170 ++++++------------
+ .../SystemUI/res/values/kscope_strings.xml    |   3 -
+ .../qs/tiles/dialog/InternetDialog.java       |  30 ----
+ .../dialog/InternetDialogController.java      |  36 ----
+ 4 files changed, 53 insertions(+), 186 deletions(-)
+
+diff --git a/packages/SystemUI/res/layout/internet_connectivity_dialog.xml b/packages/SystemUI/res/layout/internet_connectivity_dialog.xml
+index b2fc12944cb9..f72a8dc08c9c 100644
+--- a/packages/SystemUI/res/layout/internet_connectivity_dialog.xml
++++ b/packages/SystemUI/res/layout/internet_connectivity_dialog.xml
+@@ -127,130 +127,66 @@
+ 
+                 <LinearLayout
+                     android:id="@+id/mobile_network_layout"
+-                    style="@style/InternetDialog.Network"
+-                    android:layout_height="wrap_content"
+-                    android:paddingTop="20dp"
+-                    android:paddingBottom="20dp"
+-                    android:orientation="vertical">
++                    style="@style/InternetDialog.Network">
+ 
+-                    <LinearLayout
+-                        android:layout_width="match_parent"
+-                        android:layout_height="wrap_content">
+-
+-                        <FrameLayout
+-                            android:layout_width="24dp"
+-                            android:layout_height="24dp"
+-                            android:clickable="false"
+-                            android:layout_gravity="center_vertical|start">
+-                            <ImageView
+-                                android:id="@+id/signal_icon"
+-                                android:autoMirrored="true"
+-                                android:layout_width="wrap_content"
+-                                android:layout_height="wrap_content"
+-                                android:layout_gravity="center"/>
+-                        </FrameLayout>
+-
+-                        <LinearLayout
+-                            android:layout_weight="1"
+-                            android:orientation="vertical"
+-                            android:clickable="false"
++                    <FrameLayout
++                        android:layout_width="24dp"
++                        android:layout_height="24dp"
++                        android:clickable="false"
++                        android:layout_gravity="center_vertical|start">
++                        <ImageView
++                            android:id="@+id/signal_icon"
++                            android:autoMirrored="true"
+                             android:layout_width="wrap_content"
+-                            android:layout_height="match_parent"
+-                            android:gravity="start|center_vertical">
+-                            <TextView
+-                                android:id="@+id/mobile_title"
+-                                android:maxLines="1"
+-                                style="@style/InternetDialog.NetworkTitle"/>
+-                            <TextView
+-                                android:id="@+id/mobile_summary"
+-                                style="@style/InternetDialog.NetworkSummary"/>
+-                            <TextView
+-                                android:id="@+id/airplane_mode_summary"
+-                                android:text="@string/airplane_mode"
+-                                android:visibility="gone"
+-                                style="@style/InternetDialog.NetworkSummary"/>
+-                        </LinearLayout>
+-
+-                        <View
+-                            android:id="@+id/mobile_toggle_divider"
+-                            android:layout_width="1dp"
+-                            android:layout_height="28dp"
+-                            android:layout_marginStart="7dp"
+-                            android:layout_marginEnd="16dp"
+-                            android:layout_gravity="center_vertical"
+-                            android:background="?android:attr/textColorSecondary"/>
+-
+-                        <FrameLayout
+-                            android:layout_width="@dimen/settingslib_switch_track_width"
+-                            android:layout_height="48dp"
+-                            android:layout_gravity="end|center_vertical">
+-                            <Switch
+-                                android:id="@+id/mobile_toggle"
+-                                android:contentDescription="@string/mobile_data_settings_title"
+-                                android:switchMinWidth="@dimen/settingslib_switch_track_width"
+-                                android:layout_gravity="center"
+-                                android:layout_width="@dimen/settingslib_switch_track_width"
+-                                android:layout_height="match_parent"
+-                                android:track="@drawable/settingslib_track_selector"
+-                                android:thumb="@drawable/settingslib_thumb_selector"
+-                                android:theme="@style/MainSwitch.Settingslib"/>
+-                        </FrameLayout>
++                            android:layout_height="wrap_content"
++                            android:layout_gravity="center"/>
++                    </FrameLayout>
+ 
++                    <LinearLayout
++                        android:layout_weight="1"
++                        android:orientation="vertical"
++                        android:clickable="false"
++                        android:layout_width="wrap_content"
++                        android:layout_height="match_parent"
++                        android:gravity="start|center_vertical">
++                        <TextView
++                            android:id="@+id/mobile_title"
++                            android:maxLines="1"
++                            style="@style/InternetDialog.NetworkTitle"/>
++                        <TextView
++                            android:id="@+id/mobile_summary"
++                            style="@style/InternetDialog.NetworkSummary"/>
++                        <TextView
++                            android:id="@+id/airplane_mode_summary"
++                            android:text="@string/airplane_mode"
++                            android:visibility="gone"
++                            style="@style/InternetDialog.NetworkSummary"/>
+                     </LinearLayout>
+ 
+-                    <LinearLayout
+-                        android:id="@+id/fiveg_layout"
+-                        android:layout_width="match_parent"
+-                        android:layout_height="wrap_content">
++                    <View
++                        android:id="@+id/mobile_toggle_divider"
++                        android:layout_width="1dp"
++                        android:layout_height="28dp"
++                        android:layout_marginStart="7dp"
++                        android:layout_marginEnd="16dp"
++                        android:layout_gravity="center_vertical"
++                        android:background="?android:attr/textColorSecondary"/>
+ 
+-                        <ImageView
+-                            android:id="@+id/fiveg_icon"
+-                            android:layout_width="24dp"
+-                            android:layout_height="24dp"
+-                            android:clickable="false"
+-                            android:layout_gravity="center_vertical|start"
+-                            android:src="@drawable/ic_5g_mobiledata"/>
+-
+-                        <LinearLayout
+-                            android:layout_weight="1"
+-                            android:orientation="vertical"
+-                            android:clickable="false"
+-                            android:layout_width="wrap_content"
+-                            android:layout_height="match_parent"
+-                            android:gravity="start|center_vertical">
+-                            <TextView
+-                                android:id="@+id/fiveg_title"
+-                                android:maxLines="1"
+-                                style="@style/InternetDialog.NetworkTitle"
+-                                android:text="@string/enable_fiveg"/>
+-                        </LinearLayout>
+-
+-                        <View
+-                            android:id="@+id/fiveg_toggle_divider"
+-                            android:layout_width="1dp"
+-                            android:layout_height="28dp"
+-                            android:layout_marginStart="7dp"
+-                            android:layout_marginEnd="16dp"
+-                            android:layout_gravity="center_vertical"
+-                            android:background="?android:attr/textColorSecondary"/>
+-
+-                        <FrameLayout
++                    <FrameLayout
++                        android:layout_width="@dimen/settingslib_switch_track_width"
++                        android:layout_height="48dp"
++                        android:layout_gravity="end|center_vertical">
++                        <Switch
++                            android:id="@+id/mobile_toggle"
++                            android:contentDescription="@string/mobile_data_settings_title"
++                            android:switchMinWidth="@dimen/settingslib_switch_track_width"
++                            android:layout_gravity="center"
+                             android:layout_width="@dimen/settingslib_switch_track_width"
+-                            android:layout_height="48dp"
+-                            android:layout_gravity="end|center_vertical">
+-                            <Switch
+-                                android:id="@+id/fiveg_toggle"
+-                                android:contentDescription="@string/enable_fiveg"
+-                                android:switchMinWidth="@dimen/settingslib_switch_track_width"
+-                                android:layout_gravity="center"
+-                                android:layout_width="@dimen/settingslib_switch_track_width"
+-                                android:layout_height="match_parent"
+-                                android:track="@drawable/settingslib_track_selector"
+-                                android:thumb="@drawable/settingslib_thumb_selector"
+-                                android:theme="@style/MainSwitch.Settingslib"/>
+-                        </FrameLayout>
+-
+-                    </LinearLayout>
++                            android:layout_height="match_parent"
++                            android:track="@drawable/settingslib_track_selector"
++                            android:thumb="@drawable/settingslib_thumb_selector"
++                            android:theme="@style/MainSwitch.Settingslib"/>
++                    </FrameLayout>
+ 
+                 </LinearLayout>
+ 
+diff --git a/packages/SystemUI/res/values/kscope_strings.xml b/packages/SystemUI/res/values/kscope_strings.xml
+index cfcd4af92e78..5ab49af2e4dc 100644
+--- a/packages/SystemUI/res/values/kscope_strings.xml
++++ b/packages/SystemUI/res/values/kscope_strings.xml
+@@ -20,7 +20,4 @@
+     <!-- Face Unlock -->
+     <string name="face_unlock_recognizing">Recognizing face...</string>
+ 
+-    <!-- 5G toggle in internet dialog -->
+-    <string name="enable_fiveg">Enable 5G</string>
+-
+ </resources>
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialog.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialog.java
+index b1e8c9621bda..ef4d1ac14a2c 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialog.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialog.java
+@@ -133,11 +133,6 @@ public class InternetDialog extends SystemUIDialog implements
+     private Drawable mBackgroundOff = null;
+     private int mDefaultDataSubId = SubscriptionManager.INVALID_SUBSCRIPTION_ID;
+     private boolean mCanConfigMobileData;
+-    private LinearLayout mFivegLayout;
+-    private ImageView mFivegIcon;
+-    private TextView mFivegTitleText;
+-    private View mFivegToggleDivider;
+-    private Switch mFivegToggle;
+ 
+     // Wi-Fi entries
+     private int mWifiNetworkHeight;
+@@ -159,9 +154,6 @@ public class InternetDialog extends SystemUIDialog implements
+         mInternetDialogSubTitle.setText(getSubtitleText());
+     };
+ 
+-    // 5g toggle
+-    private final boolean mShouldShowFivegToggle;
+-
+     public InternetDialog(Context context, InternetDialogFactory internetDialogFactory,
+             InternetDialogController internetDialogController, boolean canConfigMobileData,
+             boolean canConfigWifi, boolean aboveStatusBar, UiEventLogger uiEventLogger,
+@@ -183,7 +175,6 @@ public class InternetDialog extends SystemUIDialog implements
+         mWifiManager = mInternetDialogController.getWifiManager();
+         mCanConfigMobileData = canConfigMobileData;
+         mCanConfigWifi = canConfigWifi;
+-        mShouldShowFivegToggle = mInternetDialogController.isFivegSupported();
+ 
+         mUiEventLogger = uiEventLogger;
+         mAdapter = new InternetAdapter(mInternetDialogController);
+@@ -236,11 +227,6 @@ public class InternetDialog extends SystemUIDialog implements
+         mMobileToggleDivider = mDialogView.requireViewById(R.id.mobile_toggle_divider);
+         mMobileDataToggle = mDialogView.requireViewById(R.id.mobile_toggle);
+         mWiFiToggle = mDialogView.requireViewById(R.id.wifi_toggle);
+-        mFivegLayout = mDialogView.requireViewById(R.id.fiveg_layout);
+-        mFivegIcon = mDialogView.requireViewById(R.id.fiveg_icon);
+-        mFivegTitleText = mDialogView.requireViewById(R.id.fiveg_title);
+-        mFivegToggleDivider = mDialogView.requireViewById(R.id.fiveg_toggle_divider);
+-        mFivegToggle = mDialogView.requireViewById(R.id.fiveg_toggle);
+         mBackgroundOn = mContext.getDrawable(R.drawable.settingslib_switch_bar_bg_on);
+         mInternetDialogTitle.setText(getDialogTitleText());
+         mInternetDialogTitle.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+@@ -297,7 +283,6 @@ public class InternetDialog extends SystemUIDialog implements
+         mWiFiToggle.setOnCheckedChangeListener(null);
+         mDoneButton.setOnClickListener(null);
+         mAirplaneModeButton.setOnClickListener(null);
+-        mFivegToggle.setOnCheckedChangeListener(null);
+         mInternetDialogController.onStop();
+         mInternetDialogFactory.destroyDialog();
+     }
+@@ -364,8 +349,6 @@ public class InternetDialog extends SystemUIDialog implements
+                                 isChecked, false);
+                     }
+                 });
+-        mFivegToggle.setOnCheckedChangeListener(
+-            (buttonView, isChecked) -> mInternetDialogController.setFivegEnabled(isChecked));
+         mConnectedWifListLayout.setOnClickListener(v -> onClickConnectedWifi());
+         mSeeAllLayout.setOnClickListener(v -> onClickSeeMoreButton());
+         mWiFiToggle.setOnCheckedChangeListener(
+@@ -400,9 +383,7 @@ public class InternetDialog extends SystemUIDialog implements
+             mMobileNetworkLayout.setVisibility(View.GONE);
+         } else {
+             mMobileNetworkLayout.setVisibility(View.VISIBLE);
+-            mFivegLayout.setVisibility(mShouldShowFivegToggle ? View.VISIBLE : View.GONE);
+             mMobileDataToggle.setChecked(mInternetDialogController.isMobileDataEnabled());
+-            mFivegToggle.setChecked(mInternetDialogController.isFivegEnabled());
+             mMobileTitleText.setText(getMobileNetworkTitle());
+             String summary = getMobileNetworkSummary();
+             if (!TextUtils.isEmpty(summary)) {
+@@ -418,15 +399,9 @@ public class InternetDialog extends SystemUIDialog implements
+                     mSignalIcon.setImageDrawable(drawable);
+                 });
+             });
+-            mFivegIcon.getDrawable().setTint(isNetworkConnected
+-                ? mContext.getColor(R.color.connected_network_primary_color)
+-                : Utils.getColorAttrDefaultColor(mContext, android.R.attr.textColorTertiary));
+             mMobileTitleText.setTextAppearance(isNetworkConnected
+                     ? R.style.TextAppearance_InternetDialog_Active
+                     : R.style.TextAppearance_InternetDialog);
+-            mFivegTitleText.setTextAppearance(isNetworkConnected
+-                    ? R.style.TextAppearance_InternetDialog_Active
+-                    : R.style.TextAppearance_InternetDialog);
+             int secondaryRes = isNetworkConnected
+                     ? R.style.TextAppearance_InternetDialog_Secondary_Active
+                     : R.style.TextAppearance_InternetDialog_Secondary;
+@@ -448,16 +423,11 @@ public class InternetDialog extends SystemUIDialog implements
+                     android.R.attr.textColorSecondary);
+             mMobileToggleDivider.setBackgroundColor(isNetworkConnected
+                     ? array.getColor(0, dividerColor) : dividerColor);
+-            mFivegToggleDivider.setBackgroundColor(isNetworkConnected
+-                    ? array.getColor(0, dividerColor) : dividerColor);
+             array.recycle();
+ 
+             mMobileDataToggle.setVisibility(mCanConfigMobileData ? View.VISIBLE : View.INVISIBLE);
+-            mFivegToggle.setVisibility(mCanConfigMobileData ? View.VISIBLE : View.INVISIBLE);
+             mMobileToggleDivider.setVisibility(
+                     mCanConfigMobileData ? View.VISIBLE : View.INVISIBLE);
+-            mFivegToggleDivider.setVisibility(
+-                    mCanConfigMobileData ? View.VISIBLE : View.INVISIBLE);
+         }
+     }
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialogController.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialogController.java
+index 975cb499b776..0d064af9c17d 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialogController.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/dialog/InternetDialogController.java
+@@ -39,7 +39,6 @@ import android.net.wifi.WifiManager;
+ import android.os.Handler;
+ import android.os.UserHandle;
+ import android.provider.Settings;
+-import android.sysprop.TelephonyProperties;
+ import android.telephony.AccessNetworkConstants;
+ import android.telephony.NetworkRegistrationInfo;
+ import android.telephony.ServiceState;
+@@ -759,41 +758,6 @@ public class InternetDialogController implements AccessPointController.AccessPoi
+         mWorkerHandler.post(() -> setMergedCarrierWifiEnabledIfNeed(subId, enabled));
+     }
+ 
+-    boolean isFivegSupported() {
+-        List<Integer> list = TelephonyProperties.default_network();
+-        for (int type : list) {
+-            if (type > 22)
+-                return true;
+-        }
+-        return false;
+-    }
+-
+-    boolean isFivegEnabled() {
+-        if (mTelephonyManager == null
+-            || (mTelephonyManager.getAllowedNetworkTypesForReason(
+-                    TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER)
+-                & TelephonyManager.NETWORK_TYPE_BITMASK_NR) == 0) {
+-            return false;
+-        }
+-        return true;
+-    }
+-
+-    void setFivegEnabled(boolean enabled) {
+-        if (mTelephonyManager == null)
+-            return;
+-
+-        long newType = mTelephonyManager.getAllowedNetworkTypesForReason(
+-            TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER);
+-        if (enabled)
+-            newType |= TelephonyManager.NETWORK_TYPE_BITMASK_NR;
+-        else
+-            newType &= ~TelephonyManager.NETWORK_TYPE_BITMASK_NR;
+-
+-        mTelephonyManager.setAllowedNetworkTypesForReason(
+-                TelephonyManager.ALLOWED_NETWORK_TYPES_REASON_USER,
+-                newType);
+-    }
+-
+     boolean isDataStateInService() {
+         final ServiceState serviceState = mTelephonyManager.getServiceState();
+         NetworkRegistrationInfo regInfo =
+-- 
+2.32.0
+

@@ -1,0 +1,26 @@
+From 44b494aba448f2617e44064882368f9790a1fc62 Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Wed, 20 Jul 2022 14:12:45 +0000
+Subject: [PATCH] SystemUI: Adjust the position of the button in the Internet
+ connectivity dialog * Display more friendly on our device
+
+---
+ packages/SystemUI/res/layout/internet_connectivity_dialog.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/packages/SystemUI/res/layout/internet_connectivity_dialog.xml b/packages/SystemUI/res/layout/internet_connectivity_dialog.xml
+index f72a8dc08c9c..e80f06bd8d38 100644
+--- a/packages/SystemUI/res/layout/internet_connectivity_dialog.xml
++++ b/packages/SystemUI/res/layout/internet_connectivity_dialog.xml
+@@ -384,7 +384,7 @@
+                 android:orientation="horizontal"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+-                android:layout_marginTop="8dp"
++                android:layout_marginTop="-16dp"
+                 android:layout_marginStart="@dimen/dialog_side_padding"
+                 android:layout_marginEnd="@dimen/dialog_side_padding"
+                 android:layout_marginBottom="@dimen/dialog_bottom_padding"
+-- 
+2.32.0
+
