@@ -1,0 +1,339 @@
+From 16719e808c82257bcc6ed7317bbb19ad560a4844 Mon Sep 17 00:00:00 2001
+From: Ezio Lacandia Bijelkic <brabus84@gmail.com>
+Date: Sun, 28 Aug 2022 13:16:40 +0000
+Subject: [PATCH] Settings: Battery light customization [2/2]
+
+---
+ res/values-zh-rCN/kscope_strings.xml          |  10 ++
+ res/values/kscope_strings.xml                 |  11 ++
+ res/xml/battery_light_settings.xml            |  68 +++++++++
+ res/xml/power_usage_summary.xml               |   6 +
+ .../settings/fuelgauge/PowerUsageSummary.java |  11 ++
+ .../settings/kscope/BatteryLightSettings.java | 141 ++++++++++++++++++
+ 6 files changed, 247 insertions(+)
+ create mode 100644 res/xml/battery_light_settings.xml
+ create mode 100644 src/com/android/settings/kscope/BatteryLightSettings.java
+
+diff --git a/res/values-zh-rCN/kscope_strings.xml b/res/values-zh-rCN/kscope_strings.xml
+index a3915ebcd9..5bc8b993ec 100644
+--- a/res/values-zh-rCN/kscope_strings.xml
++++ b/res/values-zh-rCN/kscope_strings.xml
+@@ -167,4 +167,14 @@
+     <string name="status_bar_lyric_options_title">选项</string>
+     <string name="disguise_props_for_music_app_title">对音乐应用伪装设备</string>
+     <string name="disguise_props_for_music_app_summary">在一些音乐应用中伪装设备以支持状态栏歌词。更改此开关后，您必须重新启动相关应用才能使更改生效。</string>
++    <string name="battery_light_settings">充电指示灯</string>
++    <string name="battery_light_summary">勿扰模式下和低电量时的电量指示灯行为</string>
++    <string name="battery_light_enable">电量指示灯</string>
++    <string name="battery_light_allow_on_dnd_title">勿扰模式下启用充电指示灯</string>
++    <string name="battery_light_low_blinking_title">低电量时闪烁指示灯</string>
++    <string name="battery_light_cat">充电时电量指示灯颜色</string>
++    <string name="battery_light_low_color">低电量</string>
++    <string name="battery_light_medium_color">中等电量</string>
++    <string name="battery_light_full_color">电量将满</string>
++    <string name="battery_light_reallyfull_color">满电 (100%)</string>
+ </resources>
+diff --git a/res/values/kscope_strings.xml b/res/values/kscope_strings.xml
+index 1833b68ff8..8cf251da9a 100644
+--- a/res/values/kscope_strings.xml
++++ b/res/values/kscope_strings.xml
+@@ -273,4 +273,15 @@
+     <string name="global_actions_advanced_reboot_title">Enable advanced restart</string>
+     <string name="global_actions_advanced_reboot_summary">Show options for recovery and bootloader in power menu</string>
+ 
++    <!-- Battery light -->
++    <string name="battery_light_settings">Battery charging light</string>
++    <string name="battery_light_summary">Battery light behaviour while on DND, low battery</string>
++    <string name="battery_light_enable">Battery light</string>
++    <string name="battery_light_allow_on_dnd_title">Battery light in Do Not Disturb mode</string>
++    <string name="battery_light_low_blinking_title">Blinking light on low battery</string>
++    <string name="battery_light_cat">Battery light color when charging</string>
++    <string name="battery_light_low_color">Low battery</string>
++    <string name="battery_light_medium_color">Medium battery</string>
++    <string name="battery_light_full_color">Almost full battery</string>
++    <string name="battery_light_reallyfull_color">Full (100) battery</string>
+ </resources>
+diff --git a/res/xml/battery_light_settings.xml b/res/xml/battery_light_settings.xml
+new file mode 100644
+index 0000000000..8020f80b77
+--- /dev/null
++++ b/res/xml/battery_light_settings.xml
+@@ -0,0 +1,68 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Copyright (C) 2018-2022 ArrowOS
++
++     Licensed under the Apache License, Version 2.0 (the "License");
++     you may not use this file except in compliance with the License.
++     You may obtain a copy of the License at
++
++          http://www.apache.org/licenses/LICENSE-2.0
++
++     Unless required by applicable law or agreed to in writing, software
++     distributed under the License is distributed on an "AS IS" BASIS,
++     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++     See the License for the specific language governing permissions and
++     limitations under the License.
++-->
++
++<PreferenceScreen
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:title="@string/battery_light_settings"
++    xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
++
++    <ink.kaleidoscope.support.preferences.SystemSettingSwitchPreference
++        android:key="battery_light_enabled"
++        android:title="@string/battery_light_enable"
++        android:defaultValue="true"/>
++
++    <ink.kaleidoscope.support.preferences.SystemSettingSwitchPreference
++        android:key="battery_light_allow_on_dnd"
++        android:title="@string/battery_light_allow_on_dnd_title"
++        android:dependency="battery_light_enabled"
++        android:defaultValue="false" />
++
++    <ink.kaleidoscope.support.preferences.SystemSettingSwitchPreference
++        android:key="battery_light_low_blinking"
++        android:title="@string/battery_light_low_blinking_title"
++        android:dependency="battery_light_enabled"
++        android:defaultValue="false" />
++
++    <PreferenceCategory
++        android:key="battery_light_cat"
++        android:title="@string/battery_light_cat"
++        android:dependency="battery_light_enabled">
++        <ink.kaleidoscope.support.colorpicker.ColorPickerPreference
++            android:key="battery_light_low_color"
++            android:title="@string/battery_light_low_color"
++            ledPreview="true"
++            defaultColorValue="0xFFFF0000" />
++
++        <ink.kaleidoscope.support.colorpicker.ColorPickerPreference
++            android:key="battery_light_medium_color"
++            android:title="@string/battery_light_medium_color"
++            ledPreview="true"
++            defaultColorValue="0xFFFFFF00" />
++
++        <ink.kaleidoscope.support.colorpicker.ColorPickerPreference
++            android:key="battery_light_full_color"
++            android:title="@string/battery_light_full_color"
++            ledPreview="true"
++            defaultColorValue="0xFF00FF00" />
++
++        <ink.kaleidoscope.support.colorpicker.ColorPickerPreference
++            android:key="battery_light_reallyfull_color"
++            android:title="@string/battery_light_reallyfull_color"
++            ledPreview="true"
++            defaultColorValue="0xFF00FF00" />
++    </PreferenceCategory>
++
++</PreferenceScreen>
+diff --git a/res/xml/power_usage_summary.xml b/res/xml/power_usage_summary.xml
+index 508741362b..b771d4d1a1 100644
+--- a/res/xml/power_usage_summary.xml
++++ b/res/xml/power_usage_summary.xml
+@@ -71,6 +71,12 @@
+         android:summary="@string/optimized_charge_summary"
+         android:defaultValue="false"/>
+ 
++    <Preference
++        android:key="battery_charging_light"
++        android:fragment="com.android.settings.kscope.BatteryLightSettings"
++        android:title="@string/battery_light_settings"
++        android:summary="@string/battery_light_summary" />
++
+     <com.android.settingslib.widget.FooterPreference
+         android:key="power_usage_footer"
+         android:title="@string/battery_footer_summary"
+diff --git a/src/com/android/settings/fuelgauge/PowerUsageSummary.java b/src/com/android/settings/fuelgauge/PowerUsageSummary.java
+index c10ca5d174..d4ef2767ac 100644
+--- a/src/com/android/settings/fuelgauge/PowerUsageSummary.java
++++ b/src/com/android/settings/fuelgauge/PowerUsageSummary.java
+@@ -28,6 +28,8 @@ import android.os.IBinder;
+ import android.os.RemoteException;
+ import android.os.ServiceManager;
+ import android.provider.Settings.Global;
++import androidx.preference.PreferenceGroup;
++import androidx.preference.PreferenceScreen;
+ 
+ import androidx.annotation.VisibleForTesting;
+ import androidx.loader.app.LoaderManager;
+@@ -63,6 +65,7 @@ public class PowerUsageSummary extends PowerUsageBase implements
+     static final String KEY_BATTERY_ERROR = "battery_help_message";
+     @VisibleForTesting
+     static final String KEY_BATTERY_USAGE = "battery_usage_summary";
++    private static final String KEY_BATTERY_CHARGING_LIGHT = "battery_charging_light";
+     static final String KEY_OPTIMIZED_CHARGE = "optimized_charge_enabled";
+     static final String KEY_BATTERY_HEALTH = "battery_health_enable";
+ 
+@@ -82,6 +85,7 @@ public class PowerUsageSummary extends PowerUsageBase implements
+     LayoutPreference mBatteryLayoutPref;
+     @VisibleForTesting
+     BatteryInfo mBatteryInfo;
++    Preference mBatteryLightPref;
+ 
+     @VisibleForTesting
+     BatteryHeaderPreferenceController mBatteryHeaderPreferenceController;
+@@ -182,6 +186,13 @@ public class PowerUsageSummary extends PowerUsageBase implements
+         mBatteryTipPreferenceController.restoreInstanceState(icicle);
+         updateBatteryTipFlag(icicle);
+ 
++	mBatteryLightPref = (Preference) findPreference(KEY_BATTERY_CHARGING_LIGHT);
++	PreferenceScreen prefSet = getPreferenceScreen();
++	if (!getResources()
++                .getBoolean(com.android.internal.R.bool.config_intrusiveBatteryLed))
++	{
++		prefSet.removePreference(mBatteryLightPref);
++	}
+         if (!isOptimizedChargeSupported())
+             removePreference(KEY_OPTIMIZED_CHARGE);
+ 
+diff --git a/src/com/android/settings/kscope/BatteryLightSettings.java b/src/com/android/settings/kscope/BatteryLightSettings.java
+new file mode 100644
+index 0000000000..84d349f3bc
+--- /dev/null
++++ b/src/com/android/settings/kscope/BatteryLightSettings.java
+@@ -0,0 +1,141 @@
++/*
++ * Copyright (C) 2018 ArrowOS
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package com.android.settings.kscope;
++
++import android.content.ContentResolver;
++import android.content.res.Resources;
++import android.os.Bundle;
++import android.os.UserHandle;
++import androidx.preference.ListPreference;
++import androidx.preference.Preference;
++import androidx.preference.PreferenceCategory;
++import androidx.preference.PreferenceScreen;
++import android.provider.Settings;
++
++import com.android.internal.logging.nano.MetricsProto;
++
++import ink.kaleidoscope.support.preferences.SystemSettingSwitchPreference;
++import com.android.settings.R;
++import com.android.settings.SettingsPreferenceFragment;
++
++import ink.kaleidoscope.support.colorpicker.ColorPickerPreference;
++
++public class BatteryLightSettings extends SettingsPreferenceFragment implements
++        Preference.OnPreferenceChangeListener {
++
++    private ColorPickerPreference mLowColor;
++    private ColorPickerPreference mMediumColor;
++    private ColorPickerPreference mFullColor;
++    private ColorPickerPreference mReallyFullColor;
++    private SystemSettingSwitchPreference mLowBatteryBlinking;
++
++    private PreferenceCategory mColorCategory;
++
++    @Override
++    public void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        addPreferencesFromResource(R.xml.battery_light_settings);
++
++        PreferenceScreen prefSet = getPreferenceScreen();
++        mColorCategory = (PreferenceCategory) findPreference("battery_light_cat");
++
++        mLowBatteryBlinking = (SystemSettingSwitchPreference)prefSet.findPreference("battery_light_low_blinking");
++        if (getResources().getBoolean(
++                        com.android.internal.R.bool.config_ledCanPulse)) {
++            mLowBatteryBlinking.setChecked(Settings.System.getIntForUser(getContentResolver(),
++                            Settings.System.BATTERY_LIGHT_LOW_BLINKING, 0, UserHandle.USER_CURRENT) == 1);
++            mLowBatteryBlinking.setOnPreferenceChangeListener(this);
++        } else {
++            prefSet.removePreference(mLowBatteryBlinking);
++        }
++
++        if (getResources().getBoolean(com.android.internal.R.bool.config_multiColorBatteryLed)) {
++            int color = Settings.System.getIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_LOW_COLOR, 0xFFFF0000,
++                            UserHandle.USER_CURRENT);
++            mLowColor = (ColorPickerPreference) findPreference("battery_light_low_color");
++            mLowColor.setAlphaSliderEnabled(true);
++            mLowColor.setNewPreviewColor(color);
++            mLowColor.setOnPreferenceChangeListener(this);
++
++            color = Settings.System.getIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_MEDIUM_COLOR, 0xFFFFFF00,
++                            UserHandle.USER_CURRENT);
++            mMediumColor = (ColorPickerPreference) findPreference("battery_light_medium_color");
++            mMediumColor.setAlphaSliderEnabled(true);
++            mMediumColor.setNewPreviewColor(color);
++            mMediumColor.setOnPreferenceChangeListener(this);
++
++            color = Settings.System.getIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_FULL_COLOR, 0xFF00FF00,
++                            UserHandle.USER_CURRENT);
++            mFullColor = (ColorPickerPreference) findPreference("battery_light_full_color");
++            mFullColor.setAlphaSliderEnabled(true);
++            mFullColor.setNewPreviewColor(color);
++            mFullColor.setOnPreferenceChangeListener(this);
++
++            color = Settings.System.getIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_REALLYFULL_COLOR, 0xFF00FF00,
++                            UserHandle.USER_CURRENT);
++            mReallyFullColor = (ColorPickerPreference) findPreference("battery_light_reallyfull_color");
++            mReallyFullColor.setAlphaSliderEnabled(true);
++            mReallyFullColor.setNewPreviewColor(color);
++            mReallyFullColor.setOnPreferenceChangeListener(this);
++        } else {
++            prefSet.removePreference(mColorCategory);
++        }
++    }
++
++    @Override
++    public int getMetricsCategory() {
++        return MetricsProto.MetricsEvent.BATTERY_LIGHT;
++    }
++
++    public boolean onPreferenceChange(Preference preference, Object newValue) {
++        if (preference.equals(mLowColor)) {
++            int color = ((Integer) newValue).intValue();
++            Settings.System.putIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_LOW_COLOR, color,
++                    UserHandle.USER_CURRENT);
++            return true;
++        } else if (preference.equals(mMediumColor)) {
++            int color = ((Integer) newValue).intValue();
++            Settings.System.putIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_MEDIUM_COLOR, color,
++                    UserHandle.USER_CURRENT);
++            return true;
++        } else if (preference.equals(mFullColor)) {
++            int color = ((Integer) newValue).intValue();
++            Settings.System.putIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_FULL_COLOR, color,
++                    UserHandle.USER_CURRENT);
++            return true;
++        } else if (preference.equals(mReallyFullColor)) {
++            int color = ((Integer) newValue).intValue();
++            Settings.System.putIntForUser(getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_REALLYFULL_COLOR, color,
++                    UserHandle.USER_CURRENT);
++            return true;
++        } else if (preference == mLowBatteryBlinking) {
++            boolean value = (Boolean) newValue;
++            Settings.System.putIntForUser(getActivity().getContentResolver(),
++                    Settings.System.BATTERY_LIGHT_LOW_BLINKING, value ? 1 : 0,
++                    UserHandle.USER_CURRENT);
++            mLowBatteryBlinking.setChecked(value);
++        }
++        return false;
++    }
++}
+-- 
+2.32.0
+

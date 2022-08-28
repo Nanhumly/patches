@@ -1,0 +1,319 @@
+From 68f479175f3fd7db85da2ac5b9b15729370514f3 Mon Sep 17 00:00:00 2001
+From: Sam Mortimer <sam@mortimer.me.uk>
+Date: Sun, 17 Sep 2017 19:11:02 +0800
+Subject: [PATCH] base: Battery light customization [1/2]
+
+abc ezio84: allow to disable battery light when Do Not Disturb is enabled
+use our margaritov color
+   picker for the settings part
+
+Change-Id: I66acac51d80efc5f9f69d7084b51e264e23be23a
+
+-----
+
+https://review.lineageos.org/#/c/68217/
+
+Change-Id: I293088aa88f668a2e286f21208996ee00f9ccd35
+---
+ core/java/android/provider/Settings.java      |  50 +++++++
+ core/res/res/values/kscope_config.xml         |  14 ++
+ core/res/res/values/kscope_symbols.xml        |   7 +-
+ .../com/android/server/BatteryService.java    | 130 +++++++++++++++---
+ 4 files changed, 184 insertions(+), 17 deletions(-)
+
+diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
+index 5a70b35e16b8..a6dc756ca7b6 100644
+--- a/core/java/android/provider/Settings.java
++++ b/core/java/android/provider/Settings.java
+@@ -5258,6 +5258,49 @@ public final class Settings {
+          * the setting value. See an example above.
+          */
+ 
++        /**
++         * Whether the battery light should be enabled (if hardware supports it)
++         * The value is boolean (1 or 0).
++         * @hide
++         */
++        public static final String BATTERY_LIGHT_ENABLED = "battery_light_enabled";
++
++       /**
++        * Whether to show battery light when DND mode is active
++        * @hide
++        */
++       public static final String BATTERY_LIGHT_ALLOW_ON_DND = "battery_light_allow_on_dnd";
++
++        /**
++        * Whether to show blinking light when battery is low
++        * @hide
++        */
++       public static final String BATTERY_LIGHT_LOW_BLINKING = "battery_light_low_blinking";
++
++        /**
++        * Low battery charging color
++        * @hide
++        */
++       public static final String BATTERY_LIGHT_LOW_COLOR = "battery_light_low_color";
++
++        /**
++        * Medium battery charging color
++        * @hide
++        */
++       public static final String BATTERY_LIGHT_MEDIUM_COLOR = "battery_light_medium_color";
++
++        /**
++        * Full battery charging color
++        * @hide
++        */
++       public static final String BATTERY_LIGHT_FULL_COLOR = "battery_light_full_color";
++
++        /**
++        * Really full 100 battery charging color
++        * @hide
++        */
++       public static final String BATTERY_LIGHT_REALLYFULL_COLOR = "battery_light_reallyfull_color";
++
+         /**
+          * Keys we no longer back up under the current schema, but want to continue to
+          * process when restoring historical backup datasets.
+@@ -5389,6 +5432,13 @@ public final class Settings {
+             PRIVATE_SETTINGS.add(OPTIMIZED_CHARGE_CEILING);
+             PRIVATE_SETTINGS.add(OPTIMIZED_CHARGE_FLOOR);
+             PRIVATE_SETTINGS.add(BUTTON_BACKLIGHT_ONLY_WHEN_PRESSED);
++            PRIVATE_SETTINGS.add(BATTERY_LIGHT_ENABLED);
++            PRIVATE_SETTINGS.add(BATTERY_LIGHT_ALLOW_ON_DND);
++            PRIVATE_SETTINGS.add(BATTERY_LIGHT_LOW_BLINKING);
++            PRIVATE_SETTINGS.add(BATTERY_LIGHT_LOW_COLOR);
++            PRIVATE_SETTINGS.add(BATTERY_LIGHT_MEDIUM_COLOR);
++            PRIVATE_SETTINGS.add(BATTERY_LIGHT_FULL_COLOR);
++            PRIVATE_SETTINGS.add(BATTERY_LIGHT_REALLYFULL_COLOR);
+         }
+ 
+         /**
+diff --git a/core/res/res/values/kscope_config.xml b/core/res/res/values/kscope_config.xml
+index cef0d23320c9..366ac7842717 100644
+--- a/core/res/res/values/kscope_config.xml
++++ b/core/res/res/values/kscope_config.xml
+@@ -61,4 +61,18 @@
+         <item>reboot_bootloader</item>
+     </string-array>
+ 
++    <!-- Whether to cleanup fingerprints upon connection to the daemon and when user switches -->
++    <bool name="config_cleanupUnusedFingerprints">true</bool>
++
++    <!-- Is the battery LED intrusive? Used to decide if there should be a disable option -->
++    <bool name="config_intrusiveBatteryLed">true</bool>
++
++     <!-- Does the battery LED support multiple colors?
++         Used to decide if the user can change the colors -->
++    <bool name="config_multiColorBatteryLed">false</bool>
++
++     <!-- Do the battery/notification LEDs support pulsing?
++         Used to decide if we show pulse settings -->
++    <bool name="config_ledCanPulse">true</bool>
++
+ </resources>
+diff --git a/core/res/res/values/kscope_symbols.xml b/core/res/res/values/kscope_symbols.xml
+index 5df950e4971c..24257e95648c 100644
+--- a/core/res/res/values/kscope_symbols.xml
++++ b/core/res/res/values/kscope_symbols.xml
+@@ -55,4 +55,9 @@
+     <java-symbol name="reboot_system_message" type="string" />
+     <java-symbol type="array" name="config_rebootActionsList" />
+ 
+-</resources>
+\ No newline at end of file
++    <!-- Battery Light -->
++    <java-symbol type="bool" name="config_intrusiveBatteryLed" />
++    <java-symbol type="bool" name="config_multiColorBatteryLed" />
++    <java-symbol type="bool" name="config_ledCanPulse" />
++
++</resources>
+diff --git a/services/core/java/com/android/server/BatteryService.java b/services/core/java/com/android/server/BatteryService.java
+index 325a02ec0e38..601e9d0925b0 100644
+--- a/services/core/java/com/android/server/BatteryService.java
++++ b/services/core/java/com/android/server/BatteryService.java
+@@ -24,6 +24,7 @@ import android.app.ActivityManagerInternal;
+ import android.content.ContentResolver;
+ import android.content.Context;
+ import android.content.Intent;
++import android.content.res.Resources;
+ import android.database.ContentObserver;
+ import android.hardware.health.V1_0.HealthInfo;
+ import android.hardware.health.V2_0.IHealth;
+@@ -191,6 +192,17 @@ public final class BatteryService extends SystemService {
+ 
+     private Led mLed;
+ 
++    //Battery light color customization
++    private boolean mLightEnabled = false;
++    private boolean mAllowBatteryLightOnDnd;
++    private boolean mIsDndActive;
++    private boolean mLowBatteryBlinking;
++    private boolean mMultiColorLed;
++    private int mBatteryLowARGB;
++    private int mBatteryMediumARGB;
++    private int mBatteryFullARGB;
++    private int mBatteryReallyFullARGB;
++
+     private boolean mSentLowBatteryBroadcast = false;
+ 
+     private ActivityManagerInternal mActivityManagerInternal;
+@@ -274,6 +286,83 @@ public final class BatteryService extends SystemService {
+                         false, obs, UserHandle.USER_ALL);
+                 updateBatteryWarningLevelLocked();
+             }
++        } else if (phase == PHASE_BOOT_COMPLETED) {
++            SettingsObserver mObserver = new SettingsObserver(new Handler());
++            mObserver.observe();
++        }
++    }
++
++    private synchronized void updateLed() {
++        mLed.updateLightsLocked();
++    }
++
++    class SettingsObserver extends ContentObserver {
++        SettingsObserver(Handler handler) {
++            super(handler);
++        }
++
++        void observe() {
++            ContentResolver resolver = mContext.getContentResolver();
++
++            // Battery light enabled
++            resolver.registerContentObserver(Settings.System.getUriFor(
++                    Settings.System.BATTERY_LIGHT_ENABLED),
++                    false, this, UserHandle.USER_ALL);
++            resolver.registerContentObserver(Settings.System.getUriFor(
++                    Settings.System.BATTERY_LIGHT_ALLOW_ON_DND),
++                    false, this, UserHandle.USER_ALL);
++            resolver.registerContentObserver(
++                    Settings.Global.getUriFor(Settings.Global.ZEN_MODE),
++                    false, this, UserHandle.USER_ALL);
++            resolver.registerContentObserver(Settings.System.getUriFor(
++                    Settings.System.BATTERY_LIGHT_LOW_BLINKING),
++                    false, this, UserHandle.USER_ALL);
++            if (mMultiColorLed) {
++                resolver.registerContentObserver(Settings.System.getUriFor(
++                        Settings.System.BATTERY_LIGHT_LOW_COLOR),
++                        false, this, UserHandle.USER_ALL);
++                resolver.registerContentObserver(Settings.System.getUriFor(
++                        Settings.System.BATTERY_LIGHT_MEDIUM_COLOR),
++                        false, this, UserHandle.USER_ALL);
++                resolver.registerContentObserver(Settings.System.getUriFor(
++                        Settings.System.BATTERY_LIGHT_FULL_COLOR),
++                        false, this, UserHandle.USER_ALL);
++                resolver.registerContentObserver(Settings.System.getUriFor(
++                        Settings.System.BATTERY_LIGHT_REALLYFULL_COLOR),
++                        false, this, UserHandle.USER_ALL);
++            }
++            update();
++        }
++
++        @Override
++        public void onChange(boolean selfChange) {
++            update();
++        }
++
++        public void update() {
++            ContentResolver resolver = mContext.getContentResolver();
++            Resources res = mContext.getResources();
++
++            // Battery light enabled
++            mLightEnabled = Settings.System.getInt(resolver,
++                    Settings.System.BATTERY_LIGHT_ENABLED, 1) != 0;
++            mAllowBatteryLightOnDnd = Settings.System.getInt(resolver,
++                    Settings.System.BATTERY_LIGHT_ALLOW_ON_DND, 0) == 1;
++            mIsDndActive = Settings.Global.getInt(resolver,
++                    Settings.Global.ZEN_MODE, Settings.Global.ZEN_MODE_OFF)
++                    != Settings.Global.ZEN_MODE_OFF;
++            mLowBatteryBlinking = Settings.System.getInt(resolver,
++                    Settings.System.BATTERY_LIGHT_LOW_BLINKING, 0) == 1;
++            mBatteryLowARGB = Settings.System.getInt(resolver,
++                    Settings.System.BATTERY_LIGHT_LOW_COLOR, 0xFFFF0000);
++            mBatteryMediumARGB = Settings.System.getInt(resolver,
++                    Settings.System.BATTERY_LIGHT_MEDIUM_COLOR, 0xFFFFFF00);
++            mBatteryFullARGB = Settings.System.getInt(resolver,
++                    Settings.System.BATTERY_LIGHT_FULL_COLOR, 0xFFFFFF00);
++            mBatteryReallyFullARGB = Settings.System.getInt(resolver,
++                    Settings.System.BATTERY_LIGHT_REALLYFULL_COLOR, 0xFF00FF00);
++
++            updateLed();
+         }
+     }
+ 
+@@ -1159,21 +1248,15 @@ public final class BatteryService extends SystemService {
+     private final class Led {
+         private final LogicalLight mBatteryLight;
+ 
+-        private final int mBatteryLowARGB;
+-        private final int mBatteryMediumARGB;
+-        private final int mBatteryFullARGB;
+         private final int mBatteryLedOn;
+         private final int mBatteryLedOff;
+ 
+         public Led(Context context, LightsManager lights) {
+             mBatteryLight = lights.getLight(LightsManager.LIGHT_ID_BATTERY);
+ 
+-            mBatteryLowARGB = context.getResources().getInteger(
+-                    com.android.internal.R.integer.config_notificationsBatteryLowARGB);
+-            mBatteryMediumARGB = context.getResources().getInteger(
+-                    com.android.internal.R.integer.config_notificationsBatteryMediumARGB);
+-            mBatteryFullARGB = context.getResources().getInteger(
+-                    com.android.internal.R.integer.config_notificationsBatteryFullARGB);
++            // Does the Device support changing battery LED colors?
++            mMultiColorLed = context.getResources().getBoolean(
++                    com.android.internal.R.bool.config_multiColorBatteryLed);
+             mBatteryLedOn = context.getResources().getInteger(
+                     com.android.internal.R.integer.config_notificationsBatteryLedOn);
+             mBatteryLedOff = context.getResources().getInteger(
+@@ -1187,24 +1270,39 @@ public final class BatteryService extends SystemService {
+             if (mBatteryLight == null) {
+                 return;
+             }
++            // mHealthInfo could be null on startup (called by SettingsObserver)
++            if (mHealthInfo == null) {
++                Slog.w(TAG, "updateLightsLocked: mHealthInfo is null; skipping");
++                return;
++            }
+             final int level = mHealthInfo.batteryLevel;
+             final int status = mHealthInfo.batteryStatus;
+-            if (level < mLowBatteryWarningLevel) {
++            if (!mLightEnabled || (mIsDndActive && !mAllowBatteryLightOnDnd)) {
++                mBatteryLight.turnOff();
++            } else if (level < mLowBatteryWarningLevel) {
+                 if (status == BatteryManager.BATTERY_STATUS_CHARGING) {
+-                    // Solid red when battery is charging
++                    // Battery is charging and low
+                     mBatteryLight.setColor(mBatteryLowARGB);
+-                } else {
+-                    // Flash red when battery is low and not charging
++                } else if (mLowBatteryBlinking) {
++                    // Flash when battery is low and not charging
+                     mBatteryLight.setFlashing(mBatteryLowARGB, LogicalLight.LIGHT_FLASH_TIMED,
+                             mBatteryLedOn, mBatteryLedOff);
++                } else {
++                    // "Pulse low battery light" is disabled, no lights.
++                    mBatteryLight.turnOff();
+                 }
+             } else if (status == BatteryManager.BATTERY_STATUS_CHARGING
+                     || status == BatteryManager.BATTERY_STATUS_FULL) {
+                 if (status == BatteryManager.BATTERY_STATUS_FULL || level >= 90) {
+-                    // Solid green when full or charging and nearly full
+-                    mBatteryLight.setColor(mBatteryFullARGB);
++                    if (level == 100) {
++                        // Battery is really full
++                        mBatteryLight.setColor(mBatteryReallyFullARGB);
++                    } else {
++                        // Battery is full or charging and nearly full
++                        mBatteryLight.setColor(mBatteryFullARGB);
++                    }
+                 } else {
+-                    // Solid orange when charging and halfway full
++                    // Battery is charging and halfway full
+                     mBatteryLight.setColor(mBatteryMediumARGB);
+                 }
+             } else {
+-- 
+2.32.0
+
