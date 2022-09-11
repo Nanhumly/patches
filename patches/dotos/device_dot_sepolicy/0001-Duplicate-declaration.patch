@@ -1,0 +1,23 @@
+From ba9dfa5034688ebddf5fb2403c37b3c36d1b6f5e Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Sat, 10 Sep 2022 11:41:49 +0000
+Subject: [PATCH] Duplicate declaration
+
+Change-Id: I87b8a9b5840542cd7794cedf7f231df6e6012dc8
+---
+ common/public/property.te | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/common/public/property.te b/common/public/property.te
+index 2b12f28..106b5db 100644
+--- a/common/public/property.te
++++ b/common/public/property.te
+@@ -1,5 +1,2 @@
+-# Aux camera allow/excludelist prop
+-system_vendor_config_prop(vendor_persist_camera_prop)
+-
+ # Recovery update
+ system_public_prop(recovery_update_prop)
+-- 
+2.32.0
+
