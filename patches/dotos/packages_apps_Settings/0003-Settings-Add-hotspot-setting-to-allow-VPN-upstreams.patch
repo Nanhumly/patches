@@ -1,0 +1,62 @@
+From 5f4d9e506622ac757714ee07546224b9221928c7 Mon Sep 17 00:00:00 2001
+From: Sam Mortimer <sam@mortimer.me.uk>
+Date: Thu, 15 Aug 2019 15:10:29 -0700
+Subject: [PATCH] Settings: Add hotspot setting to allow VPN upstreams [3/3]
+
+Change-Id: I34924fe8e60e3d492f219aa6d0ffa54f0bd46e38
+---
+ res/values-zh-rCN/dot_strings.xml | 6 +++++-
+ res/values/dot_strings.xml        | 6 +++++-
+ res/xml/tether_prefs.xml          | 6 ++++++
+ 3 files changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/res/values-zh-rCN/dot_strings.xml b/res/values-zh-rCN/dot_strings.xml
+index 5669192c74..27d6fa5667 100644
+--- a/res/values-zh-rCN/dot_strings.xml
++++ b/res/values-zh-rCN/dot_strings.xml
+@@ -84,5 +84,9 @@
+     <string name="selinux_status_disabled">Disabled</string>
+     <string name="selinux_status_permissive">Permissive</string>
+     <string name="selinux_status_enforcing">Enforcing</string>
+-    
++
++    <!-- Hotspot VPN -->
++    <string name="tethering_allow_vpn_upstreams_title">允许客户端使用 VPN</string>
++    <string name="tethering_allow_vpn_upstreams_summary">允许热点客户端使用此设备的 VPN 连接</string>
++
+ </resources>
+diff --git a/res/values/dot_strings.xml b/res/values/dot_strings.xml
+index 3a06fc7255..0f3b4ed239 100644
+--- a/res/values/dot_strings.xml
++++ b/res/values/dot_strings.xml
+@@ -84,5 +84,9 @@
+     <string name="selinux_status_disabled">Disabled</string>
+     <string name="selinux_status_permissive">Permissive</string>
+     <string name="selinux_status_enforcing">Enforcing</string>
+-    
++
++    <!-- Hotspot extras -->
++    <string name="tethering_allow_vpn_upstreams_title">Allow clients to use VPNs</string>
++    <string name="tethering_allow_vpn_upstreams_summary">Permit hotspot clients to use this device\u2019s VPN connections for upstream connectivity</string>
++
+ </resources>
+diff --git a/res/xml/tether_prefs.xml b/res/xml/tether_prefs.xml
+index 97ad5fd4b7..d3743e2a31 100644
+--- a/res/xml/tether_prefs.xml
++++ b/res/xml/tether_prefs.xml
+@@ -49,6 +49,12 @@
+         android:summary="@string/ethernet_tethering_subtext"
+         settings:keywords="@string/keywords_hotspot_tethering" />
+ 
++    <com.dot.support.preferences.SecureSettingSwitchPreference
++        android:key="tethering_allow_vpn_upstreams"
++        android:title="@string/tethering_allow_vpn_upstreams_title"
++        android:summary="@string/tethering_allow_vpn_upstreams_summary"
++        android:defaultValue="false" />
++
+     <com.android.settingslib.widget.FooterPreference
+         android:key="disabled_on_data_saver"
+         android:title="@string/tether_settings_disabled_on_data_saver"
+-- 
+2.32.0
+
