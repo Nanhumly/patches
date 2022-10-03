@@ -1,0 +1,123 @@
+From fbd49bfd4783d67b7d0aa9c7ba4ac8312bd04c09 Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Mon, 3 Oct 2022 06:39:37 +0000
+Subject: [PATCH] Add Simplified Chinese Translation
+
+---
+ res-mnmlist/values-zh-rCN/mnmlist_strings.xml | 34 +++++++++++++++++++
+ res-xdui/values-zh-rCN/xd_strings.xml         |  2 ++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
+index 1382a7eae7..c21328600d 100644
+--- a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
++++ b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
+@@ -110,25 +110,48 @@
+     <!-- 4G icon -->
+     <string name="show_fourg_icon_title">4G 图标</string>
+     <string name="show_fourg_icon_summary">在信号图标上显示 4G 以替代 LTE</string>
++    <!-- Old mobile type icons -->
++    <string name="use_old_mobiletype_title">使用旧版移动数据图标</string>
++    <string name="use_old_mobiletype_summary">在信号图标的顶部显示移动类型图标</string>
++    <!-- Data disabled icon -->
++    <string name="data_disabled_icon_title">数据禁用标志</string>
++    <string name="data_disabled_icon_summary">数据禁用时在信号图标处显示感叹号</string>
+     <!-- Battery Styles -->
++    <string name="battery_style_title">电池图标样式</string>
+     <string name="battery_style_category_title">电池自定义</string>
+     <string name="battery_percent_title">电量百分比</string>
+     <!-- Status bar - Battery -->
+     <string name="status_bar_battery_style_title">电池样式</string>
++    <string name="battery_style_summary">自定义电池图标，隐藏或显示电池百分比</string>
++    <string name="status_bar_battery_category_title">状态栏</string>
++    <string name="status_bar_battery_percent_title">电池百分比</string>
+     <string name="status_bar_battery_style_icon_portrait">竖置图标 (默认)</string>
+     <string name="status_bar_battery_style_circle">环形</string>
+     <string name="status_bar_battery_style_dotted_circle">环形 (虚线)</string>
+     <string name="status_bar_battery_style_filled_circle">圆圈 (实心)</string>
+     <string name="status_bar_battery_style_text">文本</string>
+     <string name="status_bar_battery_style_hidden">隐藏</string>
++    <string name="status_bar_battery_percent_text_next_right">图标旁边 (右边)</string>
++    <string name="status_bar_battery_percent_text_next_left">图标旁边 (左边)</string>
++    <string name="status_bar_battery_text_charging_title">充电时显示电池百分比</string>
++    <string name="status_bar_battery_text_charging_summary">充电时始终显示电池百分比</string>
+     <!-- Status bar - Battery percentage -->
+     <string name="status_bar_battery_percentage_title">电量百分比</string>
+     <string name="status_bar_battery_percentage_default">隐藏 (默认)</string>
+     <string name="status_bar_battery_percentage_text_inside">在图标内</string>
+     <string name="status_bar_battery_percentage_text_next">在图标旁</string>
++    <!-- QS battery -->
++    <string name="qs_battery_category_title">QS面板</string>
++    <string name="qs_use_status_bar_battery_style">遵循状态栏风格</string>
++    <!-- Torch Power button gestures -->
++    <string name="power_button_torch_title">快速启用手电筒</string>
++    <string name="power_button_torch_summary">当屏幕关闭时，长按电源键将启用手电筒</string>
+     <!-- Volume rocker wake -->
+     <string name="volume_rocker_wake_title">音量键唤醒</string>
+     <string name="volume_rocker_wake_summary">按下音量键唤醒您的设备</string>
++    <!-- Wp zoom -->
++    <string name="use_wp_zoom_title">壁纸缩放</string>
++    <string name="use_wp_zoom_summary">启用后需要重新启动</string>
+     <!-- Doze on double tap -->
+     <string name="double_tap_title">Double tap</string>
+     <string name="doze_double_tap_title">Double tap to check phone</string>
+@@ -195,6 +218,9 @@
+     <string name="other_controls_title">其他设置</string>
+     <string name="fullscreen_gestures_title">全面屏手势</string>
+     <string name="fullscreen_gestures_summary">隐藏导航栏填充和键盘空间</string>
++    <!-- Back gesture arrow -->
++    <string name="back_gesture_arrow_message">返回手势动画</string>
++    <string name="back_gesture_arrow_summary">显示后退手势的动画箭头</string>
+     <!-- Gesture navbar length -->
+     <string name="gesture_navbar_length_title">导航栏长度</string>
+     <string name="short_label">短</string>
+@@ -205,6 +231,8 @@
+     <!-- Hotspot VPN -->
+     <string name="tethering_allow_vpn_upstreams_title">允许客户端使用 VPN</string>
+     <string name="tethering_allow_vpn_upstreams_summary">允许热点客户端使用此设备\u2019的 VPN 连接到上游连接</string>
++    <!-- Invert navbar -->
++    <string name="navigation_bar_inverse_title">反转3按键导航栏</string>
+     <!-- Strings for per-app volume -->
+     <string name="app_volume">应用独立音量</string>
+     <string name="app_volume_title">每个应用的音量单独控制</string>
+@@ -241,6 +269,9 @@
+     <!-- Roaming indicator icon -->
+     <string name="roaming_indicator_icon_title">漫游标志</string>
+     <string name="roaming_indicator_icon_summary">漫游时在信号图标处显示漫游标志</string>
++    <!-- Swipe to screenshot -->
++    <string name="swipe_to_screenshot_title">滑动截屏</string>
++    <string name="swipe_to_screenshot_summary">三指向下滑动以截屏</string>
+     <!-- Game Space -->
+     <string name="game_space_title">游戏空间</string>
+     <string name="game_space_summary">增强您的游戏体验</string>
+@@ -263,4 +294,7 @@
+     <!-- Unlimited google photos storage -->
+     <string name="use_photos_spoof_title">无限照片存储</string>
+     <string name="use_photos_spoof_summary">将您的设备伪装成 Pixel XL for Google Photos 应用，仅提供无限存储空间进行备份</string>
++    <!-- Charging animation -->
++    <string name="charging_animation_title">充电动画</string>
++    <string name="charging_animation_summary">充电时显示充电动画</string>
+ </resources>
+diff --git a/res-xdui/values-zh-rCN/xd_strings.xml b/res-xdui/values-zh-rCN/xd_strings.xml
+index 2e7d60b47e..5dd30bf4fc 100644
+--- a/res-xdui/values-zh-rCN/xd_strings.xml
++++ b/res-xdui/values-zh-rCN/xd_strings.xml
+@@ -45,6 +45,7 @@
+     <string name="xd_dashboard_account">帐户</string>
+     <string name="xd_dashboard_network">互联网</string>
+     <string name="xd_dashboard_conectivity">连接</string>
++    <string name="xd_dashboard_portable_hotspot">网络共享</string>
+     <string name="xd_dashboard_display">显示</string>
+     <string name="xd_dashboard_battery">电池</string>
+     <string name="xd_dashboard_sound">声音</string>
+@@ -56,6 +57,7 @@
+     <string name="xd_dashboard_security">安全</string>
+     <string name="xd_dashboard_accessibility">辅助功能</string>
+     <string name="xd_dashboard_system">其他</string>
++    <string name="xd_dashboard_wellbeing">数字健康与家长控制</string>
+     <string name="xd_dashboard_support">帮助</string>
+     <!-- xd. mnmlist. -->
+     <string name="xd_dashboard_xzrypr">Mnmlist</string>
+-- 
+2.32.0
+

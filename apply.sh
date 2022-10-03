@@ -25,6 +25,13 @@ echo "Executing in 5 seconds - CTRL-C to exit"
 echo ""
 fi
 
+if [ $1 = xdroid ];then
+echo ""
+echo "Adapt XDroidOS to Sagit"
+echo "Executing in 5 seconds - CTRL-C to exit"
+echo ""
+fi
+
 sleep 5
 
 echo "Applying patches"
