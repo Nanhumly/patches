@@ -1,18 +1,26 @@
-From fbd49bfd4783d67b7d0aa9c7ba4ac8312bd04c09 Mon Sep 17 00:00:00 2001
+From aa21cb62b32bcb37709f4a02b07bd787f8d7af41 Mon Sep 17 00:00:00 2001
 From: Nanhumly <1607616422@qq.com>
-Date: Mon, 3 Oct 2022 06:39:37 +0000
+Date: Fri, 7 Oct 2022 15:22:17 +0000
 Subject: [PATCH] Add Simplified Chinese Translation
 
 ---
- res-mnmlist/values-zh-rCN/mnmlist_strings.xml | 34 +++++++++++++++++++
- res-xdui/values-zh-rCN/xd_strings.xml         |  2 ++
- 2 files changed, 36 insertions(+)
+ res-mnmlist/values-zh-rCN/mnmlist_strings.xml | 40 +++++++++++++++++++
+ res-xdui/values-zh-rCN/xd_strings.xml         |  2 +
+ 2 files changed, 42 insertions(+)
 
 diff --git a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
-index 1382a7eae7..c21328600d 100644
+index 1382a7eae7..2c7895dfd1 100644
 --- a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
 +++ b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
-@@ -110,25 +110,48 @@
+@@ -18,6 +18,7 @@
+ <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+     <!-- Dashboard -->
+     <string name="mnmlist_title">mnmlist</string>
++    <string name="mnmlist_summary">在这里探索我们精心挑选的功能！</string>
+     <string name="mnmlist_dashboard_title">什么是 xdroid？</string>
+     <string name="xd_tap_about">关于 xdroid</string>
+     <string name="xd_tap_about_summary">点击这里了解更多关于xdroid的信息</string>
+@@ -110,25 +111,50 @@
      <!-- 4G icon -->
      <string name="show_fourg_icon_title">4G 图标</string>
      <string name="show_fourg_icon_summary">在信号图标上显示 4G 以替代 LTE</string>
@@ -26,6 +34,8 @@ index 1382a7eae7..c21328600d 100644
 +    <string name="battery_style_title">电池图标样式</string>
      <string name="battery_style_category_title">电池自定义</string>
      <string name="battery_percent_title">电量百分比</string>
++    <!-- Screenshot shutter -->
++    <string name="screenshot_shutter_sound_title">屏幕截屏声音</string>
      <!-- Status bar - Battery -->
      <string name="status_bar_battery_style_title">电池样式</string>
 +    <string name="battery_style_summary">自定义电池图标，隐藏或显示电池百分比</string>
@@ -61,26 +71,29 @@ index 1382a7eae7..c21328600d 100644
      <!-- Doze on double tap -->
      <string name="double_tap_title">Double tap</string>
      <string name="doze_double_tap_title">Double tap to check phone</string>
-@@ -195,6 +218,9 @@
+@@ -195,6 +221,12 @@
      <string name="other_controls_title">其他设置</string>
      <string name="fullscreen_gestures_title">全面屏手势</string>
      <string name="fullscreen_gestures_summary">隐藏导航栏填充和键盘空间</string>
 +    <!-- Back gesture arrow -->
 +    <string name="back_gesture_arrow_message">返回手势动画</string>
 +    <string name="back_gesture_arrow_summary">显示后退手势的动画箭头</string>
++    <!-- mnmlist Summary -->
++    <string name="show_mnmlist_summary_title">显示 Mnmlist 摘要 </string>
++    <string name="show_mnmlist_summary_summary">在设置界面显示 mnmlist 摘要偏好</string>
      <!-- Gesture navbar length -->
      <string name="gesture_navbar_length_title">导航栏长度</string>
      <string name="short_label">短</string>
-@@ -205,6 +231,8 @@
+@@ -205,6 +237,8 @@
      <!-- Hotspot VPN -->
      <string name="tethering_allow_vpn_upstreams_title">允许客户端使用 VPN</string>
      <string name="tethering_allow_vpn_upstreams_summary">允许热点客户端使用此设备\u2019的 VPN 连接到上游连接</string>
 +    <!-- Invert navbar -->
-+    <string name="navigation_bar_inverse_title">反转3按键导航栏</string>
++    <string name="navigation_bar_inverse_title">反转三按键导航栏</string>
      <!-- Strings for per-app volume -->
      <string name="app_volume">应用独立音量</string>
      <string name="app_volume_title">每个应用的音量单独控制</string>
-@@ -241,6 +269,9 @@
+@@ -241,6 +275,9 @@
      <!-- Roaming indicator icon -->
      <string name="roaming_indicator_icon_title">漫游标志</string>
      <string name="roaming_indicator_icon_summary">漫游时在信号图标处显示漫游标志</string>
@@ -90,7 +103,7 @@ index 1382a7eae7..c21328600d 100644
      <!-- Game Space -->
      <string name="game_space_title">游戏空间</string>
      <string name="game_space_summary">增强您的游戏体验</string>
-@@ -263,4 +294,7 @@
+@@ -263,4 +300,7 @@
      <!-- Unlimited google photos storage -->
      <string name="use_photos_spoof_title">无限照片存储</string>
      <string name="use_photos_spoof_summary">将您的设备伪装成 Pixel XL for Google Photos 应用，仅提供无限存储空间进行备份</string>
