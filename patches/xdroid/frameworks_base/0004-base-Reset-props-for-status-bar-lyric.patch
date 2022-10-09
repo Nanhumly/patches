@@ -1,0 +1,70 @@
+From d050ae0647413df90278b4fe17d0c9699ca47488 Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Sun, 9 Oct 2022 14:51:27 +0000
+Subject: [PATCH] base: Reset props for status bar lyric
+
+Reset props to Meizu in some apps to use status bar lyric
+---
+ .../util/evolution/PixelPropsUtils.java       | 25 +++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/core/java/com/android/internal/util/evolution/PixelPropsUtils.java b/core/java/com/android/internal/util/evolution/PixelPropsUtils.java
+index 61a4500e30b9..2be292e47091 100644
+--- a/core/java/com/android/internal/util/evolution/PixelPropsUtils.java
++++ b/core/java/com/android/internal/util/evolution/PixelPropsUtils.java
+@@ -49,6 +49,7 @@ public class PixelPropsUtils {
+     private static final Map<String, Object> propsToChangeOP8P;
+     private static final Map<String, Object> propsToChangeOP9P;
+     private static final Map<String, Object> propsToChangeMI11;
++    private static final Map<String, Object> propsToChangeMeizu;
+     private static final Map<String, ArrayList<String>> propsToKeep;
+ 
+     private static final String[] packagesToChangePixel6A = {
+@@ -123,6 +124,15 @@ public class PixelPropsUtils {
+             "com.tencent.tmgp.sgame"
+     };
+ 
++    private static final String[] packagesToChangeMeizu = {
++            "com.netease.cloudmusic",
++            "com.tencent.qqmusic",
++	         "com.kugou.android",
++	         "cmccwm.mobilemusic",
++	         "cn.kuwo.player",
++	         "com.meizu.media.music"
++    };
++
+     // Codenames for currently supported Pixels by Google
+     private static final String[] pixelCodenames = {
+             "oriole",
+@@ -186,6 +196,12 @@ public class PixelPropsUtils {
+         propsToChangeMI11.put("DEVICE", "star");
+         propsToChangeMI11.put("PRODUCT", "star");
+         propsToChangeMI11.put("MODEL", "M2102K1G");
++        propsToChangeMeizu = new HashMap<>();
++        propsToChangeMeizu.put("BRAND", "meizu");
++        propsToChangeMeizu.put("MANUFACTURER", "meizu");
++        propsToChangeMeizu.put("DEVICE", "meizu18");
++        propsToChangeMeizu.put("PRODUCT", "meizu_18_CN");
++        propsToChangeMeizu.put("MODEL", "MEIZU 18");
+         isPixelDevice = Arrays.asList(pixelCodenames).contains(SystemProperties.get(DEVICE));
+     }
+ 
+@@ -193,6 +209,15 @@ public class PixelPropsUtils {
+         if (packageName == null || (Arrays.asList(packagesToKeep).contains(packageName)) || isPixelDevice) {
+             return;
+         }
++	    // Set Props for StatusBar Lyric
++        if (Arrays.asList(packagesToChangeMeizu).contains(packageName)) {
++            if (DEBUG) Log.d(TAG, "Defining props for: " + packageName);
++            for (Map.Entry<String, Object> prop : propsToChangeMeizu.entrySet()) {
++                String key = prop.getKey();
++                Object value = prop.getValue();
++                setPropValue(key, value);
++                }
++            }
+         if (packageName.startsWith("com.google.")
+                 || packageName.startsWith(SAMSUNG)
+                 || Arrays.asList(extraPackagesToChange).contains(packageName)) {
+-- 
+2.32.0
+

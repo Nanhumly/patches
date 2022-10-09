@@ -1,0 +1,147 @@
+From 95791f6f93b6dc70ed7b4255befdc9a0667546d4 Mon Sep 17 00:00:00 2001
+From: Kujou Yuko <i@779.moe>
+Date: Sun, 9 Oct 2022 07:15:08 +0000
+Subject: [PATCH] Add status bar lyric
+
+Signed-off-by: Kujou Yuko <i@779.moe>
+Change-Id: I944afb9e961eee72ce7fd183f2a97a9210f6c35a
+---
+ res-mnmlist/values-zh-rCN/mnmlist_strings.xml |  5 +++
+ res-mnmlist/values/mnmlist_strings.xml        |  6 +++
+ res-mnmlist/xml/mnmlist_interfaces.xml        |  7 ++++
+ res-mnmlist/xml/status_bar_lyric_settings.xml | 24 +++++++++++
+ .../fragments/StatusbarLyricSettings.java     | 40 +++++++++++++++++++
+ 5 files changed, 82 insertions(+)
+ create mode 100644 res-mnmlist/xml/status_bar_lyric_settings.xml
+ create mode 100644 src-mnmlist/com/xd/mnmlist/fragments/StatusbarLyricSettings.java
+
+diff --git a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
+index 0458274b0f..93ff91c928 100644
+--- a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
++++ b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
+@@ -47,6 +47,11 @@
+     <!-- Double Tap to Sleep Lockscreen -->
+     <string name="double_tap_sleep_lockscreen_title">双击锁屏界面休眠</string>
+     <string name="double_tap_sleep_lockscreen_summary">双击锁屏界面的任意位置休眠</string>
++    <!-- StatusBar Lyric -->
++    <string name="status_bar_lyric_title">状态栏歌词</string>
++    <string name="status_bar_lyric_summary">状态栏歌词（需要应用支持）</string>
++    <string name="status_bar_show_lyric_title">启用状态栏歌词</string>
++    <string name="status_bar_show_lyric_summary">感谢Shelling和AmeChan的贡献~</string>
+     <!-- Statusbar Tuner -->
+     <string name="statusbar_items_title">状态栏图标</string>
+     <string name="statusbar_items_summary">启用/禁用状态栏图标</string>
+diff --git a/res-mnmlist/values/mnmlist_strings.xml b/res-mnmlist/values/mnmlist_strings.xml
+index f7c3f0e494..f4e315baa2 100644
+--- a/res-mnmlist/values/mnmlist_strings.xml
++++ b/res-mnmlist/values/mnmlist_strings.xml
+@@ -107,6 +107,12 @@
+     <!-- Screenshot shutter -->
+     <string name="screenshot_shutter_sound_title">Screenshot sound</string>
+ 
++    <!-- Statusbar lyric -->
++    <string name="status_bar_lyric_title">Status bar lyric</string>
++    <string name="status_bar_lyric_summary">Show lyric in status bar (need app support)</string>
++    <string name="status_bar_show_lyric_title">Enable status bar lyric</string>
++    <string name="status_bar_show_lyric_summary">Show lyric in status bar. Thanks to @cjybyjk and @AmeChanRain! (from @exTHmUI)</string>
++
+     <!-- Statusbar net monitor -->
+     <string name="statusbar_ntraffic">Network</string>
+     <string name="network_traffic_state_title">Network speed</string>
+diff --git a/res-mnmlist/xml/mnmlist_interfaces.xml b/res-mnmlist/xml/mnmlist_interfaces.xml
+index 7940b5dbab..4de62cb2ca 100644
+--- a/res-mnmlist/xml/mnmlist_interfaces.xml
++++ b/res-mnmlist/xml/mnmlist_interfaces.xml
+@@ -83,6 +83,13 @@
+                android:fragment="com.xd.mnmlist.fragments.InterfacesNetworkTraffic"
+                android:defaultValue="false" />
+ 
++	      <!-- StatusBar Lyric -->
++	      <Preference
++	           android:key="status_bar_lyric_settings"
++	           android:title="@string/status_bar_lyric_title"
++	           android:summary="@string/status_bar_lyric_summary"
++	           android:fragment="com.xd.mnmlist.fragments.StatusbarLyricSettings"/>
++
+     </PreferenceCategory>
+ 
+ </PreferenceScreen>
+diff --git a/res-mnmlist/xml/status_bar_lyric_settings.xml b/res-mnmlist/xml/status_bar_lyric_settings.xml
+new file mode 100644
+index 0000000000..5a43521620
+--- /dev/null
++++ b/res-mnmlist/xml/status_bar_lyric_settings.xml
+@@ -0,0 +1,24 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     Copyright (C) 2022 Project Kaleidoscope
++     Licensed under the Apache License, Version 2.0 (the "License");
++     you may not use this file except in compliance with the License.
++     You may obtain a copy of the License at
++          http://www.apache.org/licenses/LICENSE-2.0
++     Unless required by applicable law or agreed to in writing, software
++     distributed under the License is distributed on an "AS IS" BASIS,
++     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++     See the License for the specific language governing permissions and
++     limitations under the License.
++-->
++<PreferenceScreen
++    android:title="@string/status_bar_lyric_title"
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
++
++      <com.xd.mnmlist.preferences.SecureSettingSwitchPreference
++        android:key="status_bar_show_lyric"
++        android:title="@string/status_bar_show_lyric_title"
++        android:summary="@string/status_bar_show_lyric_summary"
++        android:defaultValue="false"/>
++</PreferenceScreen>
+diff --git a/src-mnmlist/com/xd/mnmlist/fragments/StatusbarLyricSettings.java b/src-mnmlist/com/xd/mnmlist/fragments/StatusbarLyricSettings.java
+new file mode 100644
+index 0000000000..67a9715efb
+--- /dev/null
++++ b/src-mnmlist/com/xd/mnmlist/fragments/StatusbarLyricSettings.java
+@@ -0,0 +1,40 @@
++/*
++ * Copyright (C) 2022 Project Kaleidoscope
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.xd.mnmlist.fragments;
++
++import android.os.Bundle;
++
++import androidx.preference.Preference;
++
++import com.android.internal.logging.nano.MetricsProto;
++
++import com.android.settings.R;
++import com.android.settings.SettingsPreferenceFragment;
++
++public class StatusbarLyricSettings extends SettingsPreferenceFragment {
++
++    @Override
++    public void onCreate(Bundle icicle) {
++        super.onCreate(icicle);
++        addPreferencesFromResource(R.xml.status_bar_lyric_settings);
++    }
++
++    @Override
++    public int getMetricsCategory() {
++        return MetricsProto.MetricsEvent.XD_SETTINGS;
++    }
++}
+-- 
+2.32.0
+
