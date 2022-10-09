@@ -1,0 +1,38 @@
+From 41a4ba8ae9e27e216efde904846f9ba6a8725188 Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Sat, 8 Oct 2022 11:21:03 +0000
+Subject: [PATCH] fw/b: Updated Simplified Chinese translation
+
+---
+ core/res/res/values-zh-rCN/xd_strings.xml | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+ create mode 100644 core/res/res/values-zh-rCN/xd_strings.xml
+
+diff --git a/core/res/res/values-zh-rCN/xd_strings.xml b/core/res/res/values-zh-rCN/xd_strings.xml
+new file mode 100644
+index 000000000000..e03a811694e3
+--- /dev/null
++++ b/core/res/res/values-zh-rCN/xd_strings.xml
+@@ -0,0 +1,19 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     Copyright (C) 2022 a xdroidOSS & xyzprjkt
++     SPDX-License-Identifier: Apache-2.0
++-->
++<resources>
++    <!-- Global actions -->
++    <string name="reboot_to_bootloader_title">引导程序</string>
++    <string name="reboot_to_bootloader_message">重启到引导程序\u2026</string>
++    <string name="reboot_to_recovery_title">恢复模式</string>
++    <string name="reboot_to_recovery_message">重启到恢复模式\u2026</string>
++    <string name="reboot_system_title">重启系统</string>
++    <string name="reboot_system_message">正在重新启动\u2026</string>
++
++    <!-- Button that copies the url to the log of a crashed application -->
++    <string name="aerr_copy">复制崩溃日志链接</string>
++    <string name="url_copy_success">链接复制成功</string>
++    <string name="url_copy_failed">将日志上传到 Pasty 时出错</string>
++</resources>
+-- 
+2.32.0
+

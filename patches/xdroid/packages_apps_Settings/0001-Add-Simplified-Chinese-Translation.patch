@@ -1,15 +1,15 @@
-From aa21cb62b32bcb37709f4a02b07bd787f8d7af41 Mon Sep 17 00:00:00 2001
+From c9a522612c4a05bee942012d97f54cdb81341c3a Mon Sep 17 00:00:00 2001
 From: Nanhumly <1607616422@qq.com>
-Date: Fri, 7 Oct 2022 15:22:17 +0000
+Date: Sun, 9 Oct 2022 02:54:02 +0000
 Subject: [PATCH] Add Simplified Chinese Translation
 
 ---
- res-mnmlist/values-zh-rCN/mnmlist_strings.xml | 40 +++++++++++++++++++
- res-xdui/values-zh-rCN/xd_strings.xml         |  2 +
- 2 files changed, 42 insertions(+)
+ res-mnmlist/values-zh-rCN/mnmlist_strings.xml | 110 ++++++++++++------
+ res-xdui/values-zh-rCN/xd_strings.xml         |   3 +
+ 2 files changed, 77 insertions(+), 36 deletions(-)
 
 diff --git a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
-index 1382a7eae7..2c7895dfd1 100644
+index 1382a7eae7..0458274b0f 100644
 --- a/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
 +++ b/res-mnmlist/values-zh-rCN/mnmlist_strings.xml
 @@ -18,6 +18,7 @@
@@ -20,7 +20,84 @@ index 1382a7eae7..2c7895dfd1 100644
      <string name="mnmlist_dashboard_title">什么是 xdroid？</string>
      <string name="xd_tap_about">关于 xdroid</string>
      <string name="xd_tap_about_summary">点击这里了解更多关于xdroid的信息</string>
-@@ -110,25 +111,50 @@
+@@ -53,43 +54,41 @@
+     <string name="volume_button_music_control_title">播放控制</string>
+     <string name="volume_button_music_control_summary">当屏幕关闭时，长按音量键来切换不同曲目</string>
+     <!-- Customization Categories/Fragment Titles -->
+-    <string name="clocksettings_title">时间设置</string>
+-    <string name="clocksettings_summary">状态栏时间设置</string>
+-    <string name="status_bar_clock_date_title">时间和日期</string>
+-    <string name="status_bar_clock_date_summary">自定义你的状态栏时间</string>
+-    <string name="status_bar_clock_title">时间设置</string>
+-    <string name="status_bar_clock_show">显示时间和日期</string>
+-    <string name="status_bar_clock_style_title">时间样式</string>
+-    <string name="status_bar_clock_style_right">右侧</string>
+-    <string name="status_bar_clock_style_center">居中</string>
+-    <string name="status_bar_clock_style_left">左侧</string>
+-    <string name="status_bar_date_title">日期设置</string>
+-    <string name="status_bar_am_pm_title">上午 / 下午样式</string>
+-    <string name="status_bar_am_pm_info">24 小时制已启用</string>
+-    <string name="status_bar_am_pm_normal">中等</string>
+-    <string name="status_bar_am_pm_small">小</string>
+-    <string name="status_bar_am_pm_hidden">隐藏(默认)</string>
+-    <string name="clock_seconds_display">显示秒</string>
+-    <string name="clock_date_display">日期</string>
+-    <string name="clock_date_display_summary">在时间前显示自定义日期</string>
+-    <string name="clock_date_display_none">隐藏</string>
+-    <string name="clock_date_display_small">小号字体</string>
+-    <string name="clock_date_display_normal">正常字体</string>
+-    <string name="clock_date_style">日期样式</string>
+-    <string name="clock_date_style_normal">正常</string>
+-    <string name="clock_date_style_lowercase">小写</string>
+-    <string name="clock_date_style_uppercase">大写</string>
+-    <string name="clock_date_format_custom">自定义 java 时间格式</string>
+-    <string name="clock_date_format">日期格式</string>
+-    <string name="clock_date_string_edittext_title">必须是日期格式，例如 MM/dd/yy</string>
+-    <string name="clock_date_string_edittext_summary">输入字符串</string>
++    <string name="status_bar_clock_title">时间和日期</string>
++    <string name="status_bar_clock_summary">自定义时钟和日期</string>
++    <string name="status_bar_clock_seconds_title">时钟秒数</string>
++    <string name="status_bar_clock_seconds_summary">在状态栏的时钟旁边显示秒数</string>
++    <string name="status_bar_clock_position_title">时钟样式</string>
++    <string name="status_bar_clock_position_right">右侧</string>
++    <string name="status_bar_clock_position_left">左侧</string>
++    <string name="status_bar_clock_position_center">居中</string>
++    <string name="status_bar_clock_position_hidden">隐藏</string>
++    <string name="status_bar_clock_auto_hide_title">自动隐藏</string>
++    <string name="status_bar_clock_auto_hide_launcher_summary">如果启动器可见，则隐藏时钟</string>
++    <string name="status_bar_am_pm_title">上午/下午样式</string>
++    <string name="status_bar_am_pm_info">启用 24 小时制</string>
++    <string name="status_bar_am_pm_normal">正常</string>
++    <string name="status_bar_am_pm_small">小号</string>
++    <string name="status_bar_am_pm_hidden">隐藏</string>
++    <string name="status_bar_date_title">日期</string>
++    <string name="status_bar_date_none">隐藏</string>
++    <string name="status_bar_date_small">小号</string>
++    <string name="status_bar_date_normal">正常</string>
++    <string name="status_bar_date_format_title">日期格式</string>
++    <string name="status_bar_date_style">日期样式</string>
++    <string name="status_bar_date_style_normal">正常</string>
++    <string name="status_bar_date_style_lowercase">小写字母</string>
++    <string name="status_bar_date_style_uppercase">大写字母</string>
++    <string name="status_bar_date_format_custom">自定义 java 格式</string>
++    <string name="status_bar_date_string_edittext_title">日期格式必须如：MM/dd/yy</string>
++    <string name="status_bar_date_string_edittext_summary">输入字符串</string>
++    <string name="clock_date_position">日期位置</string>
+     <string name="clock_date_right">位于时间右侧</string>
+     <string name="clock_date_left">位于时间左侧</string>
+-    <string name="clock_date_position">日期位置</string>
+-    <string name="status_bar_clock_auto_hide_title">自动隐藏时间</string>
+-    <string name="status_bar_clock_auto_hide_summary">定期隐藏和显示时钟以节省状态栏空间</string>
+-    <string name="status_bar_clock_auto_hide_hdur_title">隐藏持续时间</string>
+-    <string name="status_bar_clock_auto_hide_sdur_title">显示持续时间</string>
++    <string name="qs_clock_title">时钟</string>
++    <string name="qs_clock_summary">在快速状态栏顶部显示时钟</string>
++    <string name="qs_date_title">日期</string>
++    <string name="qs_date_summary">在快速状态栏顶部显示日期</string>
+     <!-- Torch Power button gestures -->
+     <string name="torch_power_button_gesture_title">关闭屏幕时开启手电筒</string>
+     <string name="torch_power_button_gesture_none">禁用</string>
+@@ -110,27 +109,52 @@
      <!-- 4G icon -->
      <string name="show_fourg_icon_title">4G 图标</string>
      <string name="show_fourg_icon_summary">在信号图标上显示 4G 以替代 LTE</string>
@@ -69,9 +146,12 @@ index 1382a7eae7..2c7895dfd1 100644
 +    <string name="use_wp_zoom_title">壁纸缩放</string>
 +    <string name="use_wp_zoom_summary">启用后需要重新启动</string>
      <!-- Doze on double tap -->
-     <string name="double_tap_title">Double tap</string>
+-    <string name="double_tap_title">Double tap</string>
++    <string name="double_tap_title">双击</string>
      <string name="doze_double_tap_title">Double tap to check phone</string>
-@@ -195,6 +221,12 @@
+     <string name="doze_double_tap_summary">Pulse notifications by a double tap</string>
+     <!-- Brightness slider -->
+@@ -195,6 +219,12 @@
      <string name="other_controls_title">其他设置</string>
      <string name="fullscreen_gestures_title">全面屏手势</string>
      <string name="fullscreen_gestures_summary">隐藏导航栏填充和键盘空间</string>
@@ -84,7 +164,7 @@ index 1382a7eae7..2c7895dfd1 100644
      <!-- Gesture navbar length -->
      <string name="gesture_navbar_length_title">导航栏长度</string>
      <string name="short_label">短</string>
-@@ -205,6 +237,8 @@
+@@ -205,6 +235,8 @@
      <!-- Hotspot VPN -->
      <string name="tethering_allow_vpn_upstreams_title">允许客户端使用 VPN</string>
      <string name="tethering_allow_vpn_upstreams_summary">允许热点客户端使用此设备\u2019的 VPN 连接到上游连接</string>
@@ -93,7 +173,7 @@ index 1382a7eae7..2c7895dfd1 100644
      <!-- Strings for per-app volume -->
      <string name="app_volume">应用独立音量</string>
      <string name="app_volume_title">每个应用的音量单独控制</string>
-@@ -241,6 +275,9 @@
+@@ -241,6 +273,9 @@
      <!-- Roaming indicator icon -->
      <string name="roaming_indicator_icon_title">漫游标志</string>
      <string name="roaming_indicator_icon_summary">漫游时在信号图标处显示漫游标志</string>
@@ -103,7 +183,7 @@ index 1382a7eae7..2c7895dfd1 100644
      <!-- Game Space -->
      <string name="game_space_title">游戏空间</string>
      <string name="game_space_summary">增强您的游戏体验</string>
-@@ -263,4 +300,7 @@
+@@ -263,4 +298,7 @@
      <!-- Unlimited google photos storage -->
      <string name="use_photos_spoof_title">无限照片存储</string>
      <string name="use_photos_spoof_summary">将您的设备伪装成 Pixel XL for Google Photos 应用，仅提供无限存储空间进行备份</string>
@@ -112,18 +192,21 @@ index 1382a7eae7..2c7895dfd1 100644
 +    <string name="charging_animation_summary">充电时显示充电动画</string>
  </resources>
 diff --git a/res-xdui/values-zh-rCN/xd_strings.xml b/res-xdui/values-zh-rCN/xd_strings.xml
-index 2e7d60b47e..5dd30bf4fc 100644
+index 2e7d60b47e..a022db5e7b 100644
 --- a/res-xdui/values-zh-rCN/xd_strings.xml
 +++ b/res-xdui/values-zh-rCN/xd_strings.xml
-@@ -45,6 +45,7 @@
+@@ -43,8 +43,10 @@
+     <string name="xd_dashboard_greet12">Hey, 我在使用xdroid</string>
+     <string name="xd_dashboard_device">关于手机</string>
      <string name="xd_dashboard_account">帐户</string>
++    <string name="xd_dashboard_account_summary">在这里管理该设备中的所有用户</string>
      <string name="xd_dashboard_network">互联网</string>
      <string name="xd_dashboard_conectivity">连接</string>
 +    <string name="xd_dashboard_portable_hotspot">网络共享</string>
      <string name="xd_dashboard_display">显示</string>
      <string name="xd_dashboard_battery">电池</string>
      <string name="xd_dashboard_sound">声音</string>
-@@ -56,6 +57,7 @@
+@@ -56,6 +58,7 @@
      <string name="xd_dashboard_security">安全</string>
      <string name="xd_dashboard_accessibility">辅助功能</string>
      <string name="xd_dashboard_system">其他</string>
