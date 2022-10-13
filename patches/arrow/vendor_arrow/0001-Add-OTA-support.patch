@@ -1,0 +1,82 @@
+From 7f41e8278b179ac626de37df082589dbeba51ad9 Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Wed, 12 Oct 2022 07:10:10 +0000
+Subject: [PATCH] Add OTA support
+
+Change-Id: Ie68fc517091085e3c59c04ef885a8de439646cdf
+---
+ config/packages.mk                                    |  4 ++++
+ overlay/rro_packages/UpdaterOverlay/Android.bp        | 10 ++++++++++
+ .../rro_packages/UpdaterOverlay/AndroidManifest.xml   | 11 +++++++++++
+ .../rro_packages/UpdaterOverlay/res/values/config.xml |  9 +++++++++
+ 4 files changed, 34 insertions(+)
+ create mode 100644 overlay/rro_packages/UpdaterOverlay/Android.bp
+ create mode 100644 overlay/rro_packages/UpdaterOverlay/AndroidManifest.xml
+ create mode 100644 overlay/rro_packages/UpdaterOverlay/res/values/config.xml
+
+diff --git a/config/packages.mk b/config/packages.mk
+index 7bb818d..493b312 100644
+--- a/config/packages.mk
++++ b/config/packages.mk
+@@ -101,6 +101,10 @@ PRODUCT_PACKAGES += \
+     ssh-keygen \
+     start-ssh
+ 
++# OTA
++PRODUCT_PACKAGES += \
++    Updater \
++    UpdaterOverlay
+ # rsync
+ PRODUCT_PACKAGES += \
+     rsync
+diff --git a/overlay/rro_packages/UpdaterOverlay/Android.bp b/overlay/rro_packages/UpdaterOverlay/Android.bp
+new file mode 100644
+index 0000000..a1d4916
+--- /dev/null
++++ b/overlay/rro_packages/UpdaterOverlay/Android.bp
+@@ -0,0 +1,10 @@
++//
++// Copyright (C) 2022 The LineageOS Project
++//
++// SPDX-License-Identifier: Apache-2.0
++//
++
++runtime_resource_overlay {
++    name: "UpdaterOverlay",
++    product_specific: true,
++}
+diff --git a/overlay/rro_packages/UpdaterOverlay/AndroidManifest.xml b/overlay/rro_packages/UpdaterOverlay/AndroidManifest.xml
+new file mode 100644
+index 0000000..61d78ca
+--- /dev/null
++++ b/overlay/rro_packages/UpdaterOverlay/AndroidManifest.xml
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     Copyright (C) 2022 The LineageOS Project
++     SPDX-License-Identifier: Apache-2.0
++-->
++<manifest xmlns:android="http://schemas.android.com/apk/res/android"
++    package="org.lineageos.overlay.updater"
++    android:versionCode="1"
++    android:versionName="1.0">
++    <overlay android:targetPackage="org.lineageos.updater" android:priority="0" android:isStatic="true" />
++</manifest>
+diff --git a/overlay/rro_packages/UpdaterOverlay/res/values/config.xml b/overlay/rro_packages/UpdaterOverlay/res/values/config.xml
+new file mode 100644
+index 0000000..b4ecc48
+--- /dev/null
++++ b/overlay/rro_packages/UpdaterOverlay/res/values/config.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     Copyright (C) 2022 The LineageOS Project
++     SPDX-License-Identifier: Apache-2.0
++-->
++<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
++    <!-- URL to be checked for OTA updates -->
++    <string name="updater_server_url" translatable="false">https://raw.githubusercontent.com/Sagit-Kscope/ota/arrow-13.0/{device}.json</string>
++</resources>
+-- 
+2.32.0
+
