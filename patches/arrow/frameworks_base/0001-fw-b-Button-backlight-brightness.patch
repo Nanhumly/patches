@@ -1,4 +1,4 @@
-From 66da6fd5f41e38057dc7081cad005eee6fd61ae0 Mon Sep 17 00:00:00 2001
+From c129e54a2aa0d123e6d53763dea2c1c230539c37 Mon Sep 17 00:00:00 2001
 From: Ricardo Cerqueira <cyanogenmod@cerqueira.org>
 Date: 23 Nov 2012 14:23:16 +0000
 Subject: [PATCH] fw/b: Button backlight brightness
@@ -131,10 +131,10 @@ index 5ca0da2d3f97..f2c171f22987 100644
       * Used by the window manager to override the user activity timeout based on the
       * current foreground activity.  It can only be used to make the timeout shorter
 diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
-index fb2141b244e0..c763ba1e5035 100644
+index 5811201c00b9..393d6fbae641 100644
 --- a/core/java/android/provider/Settings.java
 +++ b/core/java/android/provider/Settings.java
-@@ -10909,6 +10909,21 @@ public final class Settings {
+@@ -10932,6 +10932,21 @@ public final class Settings {
          public static final String DEVICE_STATE_ROTATION_LOCK =
                  "device_state_rotation_lock";
  
@@ -157,14 +157,13 @@ index fb2141b244e0..c763ba1e5035 100644
           * Control whether communal mode is allowed on this device.
           *
 diff --git a/core/res/res/values/arrow_config.xml b/core/res/res/values/arrow_config.xml
-index 5da75909a26f..9e1a3f23918b 100644
+index 5a37ee63e0fd..1df0a6ca79e5 100644
 --- a/core/res/res/values/arrow_config.xml
 +++ b/core/res/res/values/arrow_config.xml
-@@ -25,4 +25,12 @@
- 
+@@ -26,6 +26,14 @@
      <!-- Whether to spoof device as Pixel XL for Google Photos -->
      <bool name="config_spoofGooglePhotos">true</bool>
-+    
+ 
 +    <!-- Button backlight control. Possible values are:
 +            0 - Not supported
 +            1 - Supported, but only on/off mode
@@ -172,19 +171,24 @@ index 5da75909a26f..9e1a3f23918b 100644
 +    -->
 +    <integer name="config_deviceSupportsButtonBrightnessControl">0</integer>
 +    <dimen name="config_buttonBrightnessSettingDefaultFloat">1.0</dimen>
++    
+     <!-- Is the battery LED intrusive? Used to decide if there should be a disable option -->
+     <bool name="config_intrusiveBatteryLed">false</bool>
  </resources>
 diff --git a/core/res/res/values/arrow_symbols.xml b/core/res/res/values/arrow_symbols.xml
-index 9fe5438731fa..ad2d93537919 100644
+index 6aea5c83d6cf..77dc8d51242c 100644
 --- a/core/res/res/values/arrow_symbols.xml
 +++ b/core/res/res/values/arrow_symbols.xml
-@@ -43,4 +43,8 @@
- 
+@@ -44,6 +44,10 @@
      <!-- Whether to spoof device as Pixel XL for Google Photos -->
      <java-symbol type="bool" name="config_spoofGooglePhotos" />
-+    
+ 
 +    <!-- Button backlight -->
 +    <java-symbol type="integer" name="config_deviceSupportsButtonBrightnessControl" />
 +    <java-symbol type="dimen" name="config_buttonBrightnessSettingDefaultFloat" />
++    
+     <!-- Battery Leds -->
+     <java-symbol type="bool" name="config_intrusiveBatteryLed" />
  </resources>
 diff --git a/packages/SettingsProvider/src/android/provider/settings/validators/SecureSettingsValidators.java b/packages/SettingsProvider/src/android/provider/settings/validators/SecureSettingsValidators.java
 index ea524720724a..9e614123540a 100644

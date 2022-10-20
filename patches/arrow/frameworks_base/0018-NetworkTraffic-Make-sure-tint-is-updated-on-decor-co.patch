@@ -1,0 +1,29 @@
+From 52d57a5914bcf1aa41605603d25919ce78fff643 Mon Sep 17 00:00:00 2001
+From: LibXZR <i@xzr.moe>
+Date: Sun, 19 Jun 2022 23:25:45 +0800
+Subject: [PATCH 4/7] NetworkTraffic: Make sure tint is updated on decor color
+ change
+
+Fixes wrong text color when enabled at the first time.
+
+Change-Id: I236852b0215d19ad8f009d6fefc7e8828cf27453
+Signed-off-by: LibXZR <i@xzr.moe>
+---
+ .../com/android/systemui/statusbar/policy/NetworkTrafficSB.java  | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
+index 4cfbda8f031f..5dfe9af85dd2 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
+@@ -138,6 +138,7 @@ public class NetworkTrafficSB extends NetworkTraffic implements DarkReceiver, St
+ 
+     @Override
+     public void setDecorColor(int color) {
++        setTintColor(color);
+     }
+ 
+     private void maybeRestoreVisibility() {
+-- 
+2.32.0
+

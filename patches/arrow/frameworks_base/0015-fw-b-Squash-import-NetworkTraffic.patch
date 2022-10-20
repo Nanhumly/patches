@@ -1,0 +1,973 @@
+From cf28a1b981556e8252dbb0cde438edde9399ff53 Mon Sep 17 00:00:00 2001
+From: Jon Haus <haus.xda@gmail.com>
+Date: Thu, 5 Jan 2017 00:20:06 +0100
+Subject: [PATCH 1/7] fw/b: Squash import NetworkTraffic
+
+This is a squash of the following:
+
+Author: Jon Haus <haus.xda@gmail.com>
+Date:   Thu Jan 5 00:20:06 2017 +0100
+
+Network Traffic [1/2]
+
+-----
+abc ezio84:
+use O darkintensity api
+use arrows vectors from aosp net arrows commit (thanks @Mazda-- for this find!): https://github.com/ezio84/abc_frameworks_base/commit/ad71ae1fd09f9a7392ab2eba7b766c8b088319b4
+fix visual glitch on statusbar expand (arrows showing and quickly hiding again)
+don't show arrows when no data
+remove unit settings (KB is good)
+remove interval (set to 1sec by def) and single arrow options
+don't get settings values again when not needed
+fix padding between arrows and speed values and expose the padding value
+code cleanup
+-----
+
+Change-Id: I026f67caec69a09c0c1969a09fbe99aa6b6f0510
+
+Author: ezio84 <brabus84@gmail.com>
+Date:   Sun Dec 9 20:17:58 2018 +0100
+
+    Move net monitor to expanded statusbar header
+
+    Preview: https://i.ibb.co/1TCCwV8/455010636-14778.jpg
+
+    Actually, with notch or low dpi and more statusbar icons we have not so
+    much space there to show the net monitor.
+    A notch can hide it and the system can now handle only a fixed max number of
+    notifications and status icons, so when net monitor shows itself it can force
+    the system to drop some icons to show the infamous dot.
+
+    Let's also consider we usually check the monitor to see if the data
+    transfer is working as expected and the speed is proper, so it's not
+    an info we want to see always (it's also distracting when reading
+    something).
+
+    So, let's move it to expanded statusbar.
+    There we have also some room to add line spacing and more info.
+
+    Change-Id: I3fca786aec4f27c763e70d404448bd71dfaecceb
+
+Author: SpiritCroc <dev@spiritcroc.de>
+Date:   Mon Dec 24 15:03:44 2018 +0100
+
+    Network traffic: fix indicator not hiding on lost connection
+
+    With https://gerrit.aicp-rom.com/c/AICP/frameworks_base/+/80636
+    ("Statusbar net monitor: stop the handler if screen is off"),
+    connectivity status can change without us noticing, so let's update in
+    updateSettings() (which is called after turning the screen on) also if
+    there is no connection.
+
+    Change-Id: I674f9cc3946f679b1ff9696079c5608fdfaa12d7
+
+commit 18e87ec1a6cf84e6765502c77010c2416b447834
+Author: Josh Chasky <jchasky@gmail.com>
+Date:   Thu Dec 19 15:13:04 2019 -0500
+
+    Make sure that Network Traffic is disabled by default
+
+    Change-Id: Ic78e82cedb676f99dd17ce88ba2e66173f000bdc
+
+Author: Alex Cruz <du.alexcruz@gmail.com>
+Date:   Sun Jan 13 10:59:49 2019 -0600
+
+    Network Traffic: Bring back traffic indicator for all
+
+    Change-Id: Ia41474a262b258f8a2d4d7b10a15891729ffd17c
+
+Author: ganeshi4u <ganeshvarmai4u@gmail.com>
+Date:   Tue Mar 12 16:01:38 2019 +0100
+
+    Network Traffic: OOS style network traffic indicator
+
+    - add separate dimens. values for SBtraffic
+    - adjust size and alignment
+    - reduce left right padding
+    - make traffic text bold/font
+    - set gravity to right
+    - nuked arrow indicators
+    - upload and download speeds view switch depending on which is higher
+
+    Change-Id: I48a16dc383ce333f0a64aa87b994d300b26e6a9c
+
+Author: ganeshi4u <ganeshvarmai4u@gmail.com>
+Date:   Wed Feb 5 22:53:25 2020 -0500
+
+    Network Traffic: Refactor text formatting
+
+    - Rework the displayed digits logic and convert them to spannable
+      strings for better individual refinement of digits/unit
+
+    - Get rid of the text size dimen as there's no need of it anymore
+
+    **DU Edits**
+    - Do to one what you do to the other. Apply the same changes to both classes,
+    statusbar and extended statusbar.
+
+    Change-Id: I7c7161460236bbc83ee530adf7c73fb9d592b3c6
+
+Author: Alex <du.alexcruz@gmail.com>
+Date:   Wed Feb 5 23:05:33 2020 -0500
+
+    Network Traffic: Adjust size/text style for extended statusbar
+
+    Change-Id: I851dac6279e0b4a60b1697ce1bd6f85fc3e248b9
+
+Author: ezio84 <brabus84@gmail.com>
+Date:   Sun Feb 9 10:24:36 2020 +0100
+
+    Traffic indicators: code cleanup and improvements
+
+    also don't continuosly check if device has notch but do it once
+
+    Change-Id: I1a97dcd6cb932d32f6bffa518a66a47a209c604e
+
+Author: ezio84 <brabus84@gmail.com>
+Date:   Sun Feb 9 15:21:33 2020 +0100
+
+    Traffic indicators: use smaller and bold fonts in expanded statusbar
+
+    Change-Id: I7d9dd2fe7850ec6f27707022fc8e4fd3cf85dfd1
+
+Author: SpiritCroc <dev@spiritcroc.de>
+Date:   Tue Feb 11 18:45:51 2020 -0500
+
+    Traffic indicators: add properly to statusbar icons
+
+    Make it behave fine on devices that don't have much status bar space
+    (e.g. because of a display cutout/"notch")
+
+    duabc: adapt to our code
+
+    Change-Id: I541e2430e2075d8dc650829d5e90039628799a15
+
+Author: ezio84 <brabus84@gmail.com>
+Date:   Wed Feb 12 19:41:28 2020 +0100
+
+    Traffic indicators: don't show two instances in expanded statusbar
+
+    we keep the one on top right of the screen (there we have more space
+    and in the future can add more net traffic info)
+
+    Change-Id: I098c93b9dd0edd146d08fd23c8c721274b9859ec
+
+Author: ezio84 <brabus84@gmail.com>
+Date:   Fri Feb 14 02:55:14 2020 -0500
+
+    Traffic indicators: Prevent logspam caused by improperly calling requestLayout()
+
+    Simple as that. Improperly calling requestLayout() was causing ViewRootImpl spam
+    the living crap out of us.
+
+    https://github.com/DirtyUnicorns/android_frameworks_base/blob/q10x/core/java/android/view/ViewRootImpl.java#L3178
+
+    Change-Id: Ia7f20be9e31508ab5188ceeaeb83716ab6548d02
+
+Author: Pranav Vashi <neobuddy89@gmail.com>
+Date:   Sun Jun 14 09:08:50 2020 +0200
+
+    NetworkTraffic: Fix speed format for 10*KB
+
+    Change-Id: I86153e8a5a314f0f44b02500878b68970a070155
+
+Author: SpiritCroc <dev@spiritcroc.de>
+Date:   Tue Nov 20 14:42:48 2018 +0100
+
+    NPE: Avoid casting network traffic to StatusBarIconView to prevent crash
+
+    Change-Id: Ib7dab59daec436f91a7c9d213583feb52f3d2b21
+
+Author: SagarMakhar <sagarmakhar@gmail.com>
+Date:   Fri Oct 29 14:19:51 2021 +0000
+
+    base: Fix net traffic view being white on QQS Header
+
+    Signed-off-by: SagarMakhar <sagarmakhar@gmail.com>
+    Signed-off-by: Genkzsz11 <genkzsz11@gmail.com>
+    Change-Id: I4f8ac1a22d1648461648174fa8725ec24e96efb0
+
+Author: Varun Date <date.varun123@gmail.com>
+Date:   Tue Jul 14 18:51:34 2020 +1000
+
+    StatubarIconList: Fix Network traffic visibility on overlayChange()
+
+    Signed-off-by: Varun Date <date.varun123@gmail.com>
+    Change-Id: I165d5bdef86f67bec9495517b338159a2fcd43d9
+
+[ReallySnow: Remove expanded QS traffic and fix the traffic showing on the QS when the lockscreen slides down]
+
+Signed-off-by: ReallySnow <reallysnow233@gmail.com>
+Change-Id: Ifd903896dd624340425ff26df21ae22700a54b49
+---
+ core/java/android/provider/Settings.java      |  12 +
+ .../settings/backup/SystemSettings.java       |   3 +-
+ .../validators/SystemSettingsValidators.java  |   2 +
+ .../stat_sys_network_traffic_updown.xml       |  29 ++
+ .../phone/StatusBarIconController.java        |  23 +-
+ .../statusbar/phone/StatusBarIconHolder.java  |   9 +
+ .../statusbar/phone/StatusBarIconList.java    |  11 +-
+ .../statusbar/policy/NetworkTraffic.java      | 363 ++++++++++++++++++
+ .../statusbar/policy/NetworkTrafficSB.java    | 157 ++++++++
+ 9 files changed, 603 insertions(+), 6 deletions(-)
+ create mode 100644 packages/SystemUI/res/drawable/stat_sys_network_traffic_updown.xml
+ create mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
+ create mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
+
+diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
+index 393d6fbae641..9d18783ecf31 100644
+--- a/core/java/android/provider/Settings.java
++++ b/core/java/android/provider/Settings.java
+@@ -5572,6 +5572,18 @@ public final class Settings {
+          */
+         public static final String TORCH_POWER_BUTTON_GESTURE = "torch_power_button_gesture";
+ 
++        /**
++         * Wheter to show network traffic indicator in statusbar
++         * @hide
++         */
++        public static final String NETWORK_TRAFFIC_STATE = "network_traffic_state";
++
++        /**
++         * Network traffic inactivity threshold
++         * @hide
++         */
++        public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
++
+         /**
+          * Keys we no longer back up under the current schema, but want to continue to
+          * process when restoring historical backup datasets.
+diff --git a/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java b/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java
+index a0bdddbb0f4c..b00ff9db368d 100644
+--- a/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java
++++ b/packages/SettingsProvider/src/android/provider/settings/backup/SystemSettings.java
+@@ -89,6 +89,7 @@ public class SystemSettings {
+         Settings.System.DISPLAY_COLOR_MODE,
+         Settings.System.ALARM_ALERT,
+         Settings.System.NOTIFICATION_LIGHT_PULSE,
+-        Settings.System.DOUBLE_TAP_SLEEP_GESTURE
++        Settings.System.DOUBLE_TAP_SLEEP_GESTURE,
++        Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD,
+     };
+ }
+diff --git a/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java b/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
+index ff2cc376b3c1..ac884e54aafd 100644
+--- a/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
++++ b/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
+@@ -209,5 +209,7 @@ public class SystemSettingsValidators {
+         VALIDATORS.put(System.NOTIFICATION_LIGHT_PULSE, BOOLEAN_VALIDATOR);
+         VALIDATORS.put(System.ACCELEROMETER_ROTATION_ANGLES, NON_NEGATIVE_INTEGER_VALIDATOR);
+         VALIDATORS.put(System.DOUBLE_TAP_SLEEP_GESTURE, BOOLEAN_VALIDATOR);
++        VALIDATORS.put(System.NETWORK_TRAFFIC_STATE, BOOLEAN_VALIDATOR);
++        VALIDATORS.put(System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD, BOOLEAN_VALIDATOR);
+     }
+ }
+diff --git a/packages/SystemUI/res/drawable/stat_sys_network_traffic_updown.xml b/packages/SystemUI/res/drawable/stat_sys_network_traffic_updown.xml
+new file mode 100644
+index 000000000000..4e0b63ceffe4
+--- /dev/null
++++ b/packages/SystemUI/res/drawable/stat_sys_network_traffic_updown.xml
+@@ -0,0 +1,29 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++    Copyright (C) 2017 The Android Open Source Project
++    Copyright (C) 2017 ABC rom
++
++    Licensed under the Apache License, Version 2.0 (the "License");
++    you may not use this file except in compliance with the License.
++    You may obtain a copy of the License at
++
++        http://www.apache.org/licenses/LICENSE-2.0
++
++    Unless required by applicable law or agreed to in writing, software
++    distributed under the License is distributed on an "AS IS" BASIS,
++    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++    See the License for the specific language governing permissions and
++    limitations under the License.
++-->
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++        android:width="5dp"
++        android:height="17.0dp"
++        android:viewportWidth="7.1"
++        android:viewportHeight="24.0">
++    <path
++        android:fillColor="#ffffff"
++        android:pathData="M3.6000004,10.8l3.5,0.0 -3.5,-7.3 0.0,0.0 0.0,0.0 0.0,0.0 0.0,0.0 -3.6,7.3z"/>
++    <path
++        android:fillColor="#ffffff"
++        android:pathData="M3.6000004,13.2l-3.6,0.0 3.6,7.3 0.0,0.0 0.0,0.0 0.0,0.0 0.0,0.0 3.5,-7.3z"/>
++</vector>
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java
+index 31d9266057da..d80b1c9b1252 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java
+@@ -16,6 +16,7 @@ package com.android.systemui.statusbar.phone;
+ 
+ import static com.android.systemui.statusbar.phone.StatusBarIconHolder.TYPE_ICON;
+ import static com.android.systemui.statusbar.phone.StatusBarIconHolder.TYPE_MOBILE;
++import static com.android.systemui.statusbar.phone.StatusBarIconHolder.TYPE_NETWORK_TRAFFIC;
+ import static com.android.systemui.statusbar.phone.StatusBarIconHolder.TYPE_WIFI;
+ 
+ import android.annotation.Nullable;
+@@ -48,6 +49,7 @@ import com.android.systemui.statusbar.StatusIconDisplayable;
+ import com.android.systemui.statusbar.phone.StatusBarSignalPolicy.CallIndicatorIconState;
+ import com.android.systemui.statusbar.phone.StatusBarSignalPolicy.MobileIconState;
+ import com.android.systemui.statusbar.phone.StatusBarSignalPolicy.WifiIconState;
++import com.android.systemui.statusbar.policy.NetworkTrafficSB;
+ import com.android.systemui.util.Assert;
+ 
+ import java.util.ArrayList;
+@@ -313,6 +315,9 @@ public interface StatusBarIconController {
+ 
+                 case TYPE_MOBILE:
+                     return addMobileIcon(index, slot, holder.getMobileState());
++
++                case TYPE_NETWORK_TRAFFIC:
++                    return addNetworkTraffic(index, slot);
+             }
+ 
+             return null;
+@@ -339,6 +344,12 @@ public interface StatusBarIconController {
+             return view;
+         }
+ 
++        protected NetworkTrafficSB addNetworkTraffic(int index, String slot) {
++            NetworkTrafficSB view = onCreateNetworkTraffic(slot);
++            mGroup.addView(view, index, onCreateLayoutParams());
++            return view;
++        }
++
+         @VisibleForTesting
+         protected StatusBarMobileView addMobileIcon(int index, String slot, MobileIconState state) {
+             StatusBarMobileView view = onCreateStatusBarMobileView(slot);
+@@ -367,6 +378,12 @@ public interface StatusBarIconController {
+             return view;
+         }
+ 
++        private NetworkTrafficSB onCreateNetworkTraffic(String slot) {
++            NetworkTrafficSB view = new NetworkTrafficSB(mContext);
++            view.setPadding(4, 0, 4, 0);
++            return view;
++        }
++
+         protected LinearLayout.LayoutParams onCreateLayoutParams() {
+             return new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, mIconSize);
+         }
+@@ -408,8 +425,10 @@ public interface StatusBarIconController {
+         }
+ 
+         public void onSetIcon(int viewIndex, StatusBarIcon icon) {
+-            StatusBarIconView view = (StatusBarIconView) mGroup.getChildAt(viewIndex);
+-            view.set(icon);
++            View view = mGroup.getChildAt(viewIndex);
++            if (view instanceof StatusBarIconView) {
++                ((StatusBarIconView) view).set(icon);
++            }
+         }
+ 
+         public void onSetIconHolder(int viewIndex, StatusBarIconHolder holder) {
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconHolder.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconHolder.java
+index af342dd31a76..294f42d83fbc 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconHolder.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconHolder.java
+@@ -33,6 +33,7 @@ public class StatusBarIconHolder {
+     public static final int TYPE_ICON = 0;
+     public static final int TYPE_WIFI = 1;
+     public static final int TYPE_MOBILE = 2;
++    public static final int TYPE_NETWORK_TRAFFIC = 3;
+ 
+     private StatusBarIcon mIcon;
+     private WifiIconState mWifiState;
+@@ -95,6 +96,12 @@ public class StatusBarIconHolder {
+         return holder;
+     }
+ 
++    public static StatusBarIconHolder fromNetworkTraffic() {
++        StatusBarIconHolder holder = new StatusBarIconHolder();
++        holder.mType = TYPE_NETWORK_TRAFFIC;
++        return holder;
++    }
++
+     public int getType() {
+         return mType;
+     }
+@@ -134,6 +141,8 @@ public class StatusBarIconHolder {
+                 return mWifiState.visible;
+             case TYPE_MOBILE:
+                 return mMobileState.visible;
++            case TYPE_NETWORK_TRAFFIC:
++                return true;
+ 
+             default: return true;
+         }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconList.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconList.java
+index c876c3228eb8..8675b7b46379 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconList.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconList.java
+@@ -27,6 +27,8 @@ import java.io.PrintWriter;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
++import com.android.systemui.statusbar.policy.NetworkTrafficSB;
++
+ public class StatusBarIconList {
+     private ArrayList<Slot> mSlots = new ArrayList<>();
+ 
+@@ -35,6 +37,9 @@ public class StatusBarIconList {
+         for (int i=0; i < N; i++) {
+             mSlots.add(new Slot(slots[i], null));
+         }
++
++        // Network traffic slot
++        mSlots.add(0, new Slot(NetworkTrafficSB.SLOT, StatusBarIconHolder.fromNetworkTraffic()));
+     }
+ 
+     public int getSlotIndex(String slot) {
+@@ -45,9 +50,9 @@ public class StatusBarIconList {
+                 return i;
+             }
+         }
+-        // Auto insert new items at the beginning.
+-        mSlots.add(0, new Slot(slot, null));
+-        return 0;
++        // Auto insert new items behind network traffic
++        mSlots.add(1, new Slot(slot, null));
++        return 1;
+     }
+ 
+     protected ArrayList<Slot> getSlots() {
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
+new file mode 100644
+index 000000000000..458bc6c75232
+--- /dev/null
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
+@@ -0,0 +1,363 @@
++package com.android.systemui.statusbar.policy;
++
++import java.text.DecimalFormat;
++
++import android.content.BroadcastReceiver;
++import android.content.ContentResolver;
++import android.content.Context;
++import android.content.Intent;
++import android.content.IntentFilter;
++import android.content.res.Resources;
++import android.database.ContentObserver;
++import android.graphics.drawable.Drawable;
++import android.graphics.PorterDuff.Mode;
++import android.graphics.Rect;
++import android.graphics.Typeface;
++import android.view.Gravity;
++import android.net.ConnectivityManager;
++import android.net.NetworkInfo;
++import android.net.TrafficStats;
++import android.os.Handler;
++import android.os.UserHandle;
++import android.os.Message;
++import android.os.SystemClock;
++import android.provider.Settings;
++import android.text.Spanned;
++import android.text.SpannableString;
++import android.text.style.RelativeSizeSpan;
++import android.text.TextUtils;
++import android.util.AttributeSet;
++import android.util.TypedValue;
++import android.view.View;
++import android.widget.TextView;
++
++import com.android.systemui.R;
++
++/*
++*
++* Seeing how an Integer object in java requires at least 16 Bytes, it seemed awfully wasteful
++* to only use it for a single boolean. 32-bits is plenty of room for what we need it to do.
++*
++*/
++public class NetworkTraffic extends TextView {
++
++    private static final int INTERVAL = 1500; //ms
++    private static final int KB = 1024;
++    private static final int MB = KB * KB;
++    private static final int GB = MB * KB;
++    private static final String symbol = "/s";
++
++    protected boolean mIsEnabled;
++    private boolean mAttached;
++    private long totalRxBytes;
++    private long totalTxBytes;
++    private long lastUpdateTime;
++    private int mAutoHideThreshold;
++    protected int mTintColor;
++
++    private boolean mScreenOn = true;
++    protected boolean mVisible = true;
++    private ConnectivityManager mConnectivityManager;
++
++    private Handler mTrafficHandler = new Handler() {
++        @Override
++        public void handleMessage(Message msg) {
++            long timeDelta = SystemClock.elapsedRealtime() - lastUpdateTime;
++
++            if (timeDelta < INTERVAL * .95) {
++                if (msg.what != 1) {
++                    // we just updated the view, nothing further to do
++                    return;
++                }
++                if (timeDelta < 1) {
++                    // Can't div by 0 so make sure the value displayed is minimal
++                    timeDelta = Long.MAX_VALUE;
++                }
++            }
++            lastUpdateTime = SystemClock.elapsedRealtime();
++
++            // Calculate the data rate from the change in total bytes and time
++            long newTotalRxBytes = TrafficStats.getTotalRxBytes();
++            long newTotalTxBytes = TrafficStats.getTotalTxBytes();
++            long rxData = newTotalRxBytes - totalRxBytes;
++            long txData = newTotalTxBytes - totalTxBytes;
++
++            if (shouldHide(rxData, txData, timeDelta)) {
++                setText("");
++                setVisibility(View.GONE);
++                mVisible = false;
++            } else if (shouldShowUpload(rxData, txData, timeDelta)) {
++                // Show information for uplink if it's called for
++                CharSequence output = formatOutput(timeDelta, txData, symbol);
++
++                // Update view if there's anything new to show
++                if (output != getText()) {
++                    setText(output);
++                }
++            } else {
++                // Add information for downlink if it's called for
++                CharSequence output = formatOutput(timeDelta, rxData, symbol);
++
++                // Update view if there's anything new to show
++                if (output != getText()) {
++                    setText(output);
++                }
++                makeVisible();
++            }
++
++            // Post delayed message to refresh in ~1000ms
++            totalRxBytes = newTotalRxBytes;
++            totalTxBytes = newTotalTxBytes;
++            clearHandlerCallbacks();
++            mTrafficHandler.postDelayed(mRunnable, INTERVAL);
++        }
++
++        private CharSequence formatOutput(long timeDelta, long data, String symbol) {
++            long speed = (long)(data / (timeDelta / 1000F));
++
++            return formatDecimal(speed);
++        }
++
++        private CharSequence formatDecimal(long speed) {
++            DecimalFormat decimalFormat;
++            String unit;
++            String formatSpeed;
++            SpannableString spanUnitString;
++            SpannableString spanSpeedString;
++
++            if (speed >= GB) {
++                unit = "GB";
++                decimalFormat = new DecimalFormat("0.00");
++                formatSpeed =  decimalFormat.format(speed / (float)GB);
++            } else if (speed >= 100 * MB) {
++                decimalFormat = new DecimalFormat("000");
++                unit = "MB";
++                formatSpeed =  decimalFormat.format(speed / (float)MB);
++            } else if (speed >= 10 * MB) {
++                decimalFormat = new DecimalFormat("00.0");
++                unit = "MB";
++                formatSpeed =  decimalFormat.format(speed / (float)MB);
++            } else if (speed >= MB) {
++                decimalFormat = new DecimalFormat("0.00");
++                unit = "MB";
++                formatSpeed =  decimalFormat.format(speed / (float)MB);
++            } else if (speed >= 100 * KB) {
++                decimalFormat = new DecimalFormat("000");
++                unit = "KB";
++                formatSpeed =  decimalFormat.format(speed / (float)KB);
++            } else if (speed >= 10 * KB) {
++                decimalFormat = new DecimalFormat("00.0");
++                unit = "KB";
++                formatSpeed =  decimalFormat.format(speed / (float)KB);
++            } else {
++                decimalFormat = new DecimalFormat("0.00");
++                unit = "KB";
++                formatSpeed = decimalFormat.format(speed / (float)KB);
++            }
++            spanSpeedString = new SpannableString(formatSpeed);
++            spanSpeedString.setSpan(getSpeedRelativeSizeSpan(), 0, (formatSpeed).length(),
++                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
++
++            spanUnitString = new SpannableString(unit + symbol);
++            spanUnitString.setSpan(getUnitRelativeSizeSpan(), 0, (unit + symbol).length(),
++                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
++            return TextUtils.concat(spanSpeedString, "\n", spanUnitString);
++        }
++
++        private boolean shouldHide(long rxData, long txData, long timeDelta) {
++            long speedRxKB = (long)(rxData / (timeDelta / 1000f)) / KB;
++            long speedTxKB = (long)(txData / (timeDelta / 1000f)) / KB;
++            return !getConnectAvailable() ||
++                    (speedRxKB < mAutoHideThreshold &&
++                    speedTxKB < mAutoHideThreshold);
++        }
++
++        private boolean shouldShowUpload(long rxData, long txData, long timeDelta) {
++            long speedRxKB = (long)(rxData / (timeDelta / 1000f)) / KB;
++                long speedTxKB = (long)(txData / (timeDelta / 1000f)) / KB;
++
++            return (speedTxKB > speedRxKB);
++        }
++    };
++
++    protected boolean restoreViewQuickly() {
++        return getConnectAvailable() && mAutoHideThreshold == 0;
++    }
++
++    protected void makeVisible() {
++        setVisibility(View.VISIBLE);
++        mVisible = true;
++    }
++
++    /*
++     *  @hide
++     */
++    public NetworkTraffic(Context context) {
++        this(context, null);
++    }
++
++    /*
++     *  @hide
++     */
++    public NetworkTraffic(Context context, AttributeSet attrs) {
++        this(context, attrs, 0);
++    }
++
++    /*
++     *  @hide
++     */
++    public NetworkTraffic(Context context, AttributeSet attrs, int defStyle) {
++        super(context, attrs, defStyle);
++        final Resources resources = getResources();
++        mTintColor = getCurrentTextColor();
++        setMode();
++        Handler mHandler = new Handler();
++        mConnectivityManager =
++                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
++        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
++        settingsObserver.observe();
++        update();
++    }
++
++    @Override
++    protected void onAttachedToWindow() {
++        super.onAttachedToWindow();
++        if (!mAttached) {
++            mAttached = true;
++            IntentFilter filter = new IntentFilter();
++            filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
++            filter.addAction(Intent.ACTION_SCREEN_OFF);
++            filter.addAction(Intent.ACTION_SCREEN_ON);
++            mContext.registerReceiver(mIntentReceiver, filter, null, getHandler());
++        }
++        update();
++    }
++
++    @Override
++    protected void onDetachedFromWindow() {
++        super.onDetachedFromWindow();
++        if (mAttached) {
++            mContext.unregisterReceiver(mIntentReceiver);
++            mAttached = false;
++        }
++    }
++
++    protected RelativeSizeSpan getSpeedRelativeSizeSpan() {
++        return new RelativeSizeSpan(0.80f);
++    }
++
++    protected RelativeSizeSpan getUnitRelativeSizeSpan() {
++        return new RelativeSizeSpan(0.75f);
++    }
++
++    private Runnable mRunnable = new Runnable() {
++        @Override
++        public void run() {
++            mTrafficHandler.sendEmptyMessage(0);
++        }
++    };
++
++    class SettingsObserver extends ContentObserver {
++        SettingsObserver(Handler handler) {
++            super(handler);
++        }
++
++        void observe() {
++            ContentResolver resolver = mContext.getContentResolver();
++            resolver.registerContentObserver(Settings.System
++                    .getUriFor(Settings.System.NETWORK_TRAFFIC_STATE), false,
++                    this, UserHandle.USER_ALL);
++            resolver.registerContentObserver(Settings.System
++                    .getUriFor(Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD), false,
++                    this, UserHandle.USER_ALL);
++        }
++
++        /*
++         *  @hide
++         */
++        @Override
++        public void onChange(boolean selfChange) {
++            setMode();
++            update();
++        }
++    }
++
++    private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
++        @Override
++        public void onReceive(Context context, Intent intent) {
++            String action = intent.getAction();
++            if (action == null) return;
++            if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION) && mScreenOn) {
++                update();
++            } else if (action.equals(Intent.ACTION_SCREEN_ON)) {
++                mScreenOn = true;
++                update();
++            } else if (action.equals(Intent.ACTION_SCREEN_OFF)) {
++                mScreenOn = false;
++                clearHandlerCallbacks();
++            }
++        }
++    };
++
++    private boolean getConnectAvailable() {
++        NetworkInfo network = (mConnectivityManager != null) ? mConnectivityManager.getActiveNetworkInfo() : null;
++        return network != null;
++    }
++
++    protected void update() {
++        if (mIsEnabled) {
++            if (mAttached) {
++                totalRxBytes = TrafficStats.getTotalRxBytes();
++                lastUpdateTime = SystemClock.elapsedRealtime();
++                mTrafficHandler.sendEmptyMessage(1);
++            }
++            return;
++        } else {
++            clearHandlerCallbacks();
++        }
++        setVisibility(View.GONE);
++        mVisible = false;
++    }
++
++    protected void setMode() {
++        ContentResolver resolver = mContext.getContentResolver();
++        mIsEnabled = Settings.System.getIntForUser(resolver,
++                Settings.System.NETWORK_TRAFFIC_STATE, 0,
++                UserHandle.USER_CURRENT) == 1;
++        mAutoHideThreshold = Settings.System.getIntForUser(resolver,
++                Settings.System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD, 1,
++                UserHandle.USER_CURRENT);
++        setGravity(Gravity.CENTER);
++        setMaxLines(2);
++        setSpacingAndFonts();
++        updateTrafficDrawable();
++        setVisibility(View.GONE);
++        mVisible = false;
++    }
++
++    private void clearHandlerCallbacks() {
++        mTrafficHandler.removeCallbacks(mRunnable);
++        mTrafficHandler.removeMessages(0);
++        mTrafficHandler.removeMessages(1);
++    }
++
++    protected void updateTrafficDrawable() {
++        setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
++        setTextColor(mTintColor);
++    }
++
++    protected void setSpacingAndFonts() {
++        setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
++        setLineSpacing(0.80f, 0.80f);
++    }
++
++    public void onDensityOrFontScaleChanged() {
++        setSpacingAndFonts();
++        update();
++    }
++
++    public void setTintColor(int color) {
++        mTintColor = color;
++        updateTrafficDrawable();
++    }
++}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
+new file mode 100644
+index 000000000000..4cfbda8f031f
+--- /dev/null
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
+@@ -0,0 +1,157 @@
++package com.android.systemui.statusbar.policy;
++
++import static com.android.systemui.statusbar.StatusBarIconView.STATE_DOT;
++import static com.android.systemui.statusbar.StatusBarIconView.STATE_HIDDEN;
++import static com.android.systemui.statusbar.StatusBarIconView.STATE_ICON;
++
++import android.content.Context;
++import android.graphics.Rect;
++import android.graphics.Typeface;
++import android.text.style.RelativeSizeSpan;
++import android.util.AttributeSet;
++import android.view.View;
++
++import com.android.systemui.Dependency;
++import com.android.systemui.R;
++import com.android.systemui.plugins.DarkIconDispatcher;
++import com.android.systemui.plugins.DarkIconDispatcher.DarkReceiver;
++import com.android.systemui.statusbar.StatusIconDisplayable;
++
++import java.util.ArrayList;
++
++public class NetworkTrafficSB extends NetworkTraffic implements DarkReceiver, StatusIconDisplayable {
++
++    public static final String SLOT = "networktraffic";
++    private int mVisibleState = -1;
++    private boolean mSystemIconVisible = true;
++
++    /*
++     *  @hide
++     */
++    public NetworkTrafficSB(Context context) {
++        this(context, null);
++    }
++
++    /*
++     *  @hide
++     */
++    public NetworkTrafficSB(Context context, AttributeSet attrs) {
++        this(context, attrs, 0);
++    }
++
++    /*
++     *  @hide
++     */
++    public NetworkTrafficSB(Context context, AttributeSet attrs, int defStyle) {
++        super(context, attrs, defStyle);
++    }
++
++    @Override
++    protected void onAttachedToWindow() {
++        super.onAttachedToWindow();
++    }
++
++    @Override
++    protected void onDetachedFromWindow() {
++        super.onDetachedFromWindow();
++    }
++
++    @Override
++    protected void setMode() {
++        super.setMode();
++        mIsEnabled = mIsEnabled;
++    }
++
++    @Override
++    protected void setSpacingAndFonts() {
++        setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
++        setLineSpacing(0.75f, 0.75f);
++    }
++
++    @Override
++    protected RelativeSizeSpan getSpeedRelativeSizeSpan() {
++        return new RelativeSizeSpan(0.75f);
++    }
++
++    @Override
++    protected RelativeSizeSpan getUnitRelativeSizeSpan() {
++        return new RelativeSizeSpan(0.7f);
++    }
++
++    @Override
++    public void onDarkChanged(ArrayList<Rect> areas, float darkIntensity, int tint) {
++        if (!mIsEnabled) return;
++        mTintColor = DarkIconDispatcher.getTint(areas, this, tint);
++        setTextColor(mTintColor);
++        updateTrafficDrawable();
++    }
++
++    @Override
++    public String getSlot() {
++        return SLOT;
++    }
++
++    @Override
++    public boolean isIconVisible() {
++        return mIsEnabled;
++    }
++
++    @Override
++    public int getVisibleState() {
++        return mVisibleState;
++    }
++
++    @Override
++    public void setVisibleState(int state, boolean mIsEnabled) {
++        if (state == mVisibleState) {
++            return;
++        }
++        mVisibleState = state;
++
++        switch (state) {
++            case STATE_ICON:
++                mSystemIconVisible = true;
++                break;
++            case STATE_DOT:
++            case STATE_HIDDEN:
++            default:
++                mSystemIconVisible = false;
++                break;
++        }
++        update();
++    }
++
++    @Override
++    protected void makeVisible() {
++        boolean show = mSystemIconVisible;
++        setVisibility(show ? View.VISIBLE
++                : View.GONE);
++        mVisible = show;
++    }
++
++    @Override
++    public void setStaticDrawableColor(int color) {
++        mTintColor = color;
++        setTextColor(mTintColor);
++        updateTrafficDrawable();
++    }
++
++    @Override
++    public void setDecorColor(int color) {
++    }
++
++    private void maybeRestoreVisibility() {
++        if (!mVisible && mIsEnabled && mSystemIconVisible
++           && restoreViewQuickly()) {
++          setVisibility(View.VISIBLE);
++          mVisible = true;
++          // then let the traffic handler do its checks
++          update();
++        }
++    }
++
++    public void setTintColor(int color) {
++        mTintColor = color;
++        updateTrafficDrawable();
++    }
++}
+-- 
+2.32.0
+

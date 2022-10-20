@@ -1,0 +1,99 @@
+From 3193d4c1911e5d76e095aa9551e1b0caf24d2c2a Mon Sep 17 00:00:00 2001
+From: Adithya R <gh0strider.2k18.reborn@gmail.com>
+Date: Sat, 13 Feb 2021 21:21:13 +0530
+Subject: [PATCH 6/7] SystemUI: NetworkTraffic: Minor refinements
+
+- reduce side padding of statusbar indicator
+- show /S in caps
+- reduce overall text size and increase line spacing
+
+	SystemUI: Reduce statusbar network speed margins
+
+	Change-Id: I0d031048a5499508138f04f7be2ae12819d4ee69
+
+arrow-12.1: Correct values
+
+Change-Id: I9bc80ba00700c5a184cce2b6703d11986203739b
+---
+ .../systemui/statusbar/phone/StatusBarIconController.java | 2 +-
+ .../android/systemui/statusbar/policy/NetworkTraffic.java | 8 ++++----
+ .../systemui/statusbar/policy/NetworkTrafficSB.java       | 6 +++---
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java
+index d80b1c9b1252..26cc579e0cd7 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarIconController.java
+@@ -380,7 +380,7 @@ public interface StatusBarIconController {
+ 
+         private NetworkTrafficSB onCreateNetworkTraffic(String slot) {
+             NetworkTrafficSB view = new NetworkTrafficSB(mContext);
+-            view.setPadding(4, 0, 4, 0);
++            view.setPadding(2, 0, 2, 0);
+             return view;
+         }
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
+index c8ad8a951d46..749bb11957df 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
+@@ -45,7 +45,7 @@ public class NetworkTraffic extends TextView {
+     private static final int KB = 1024;
+     private static final int MB = KB * KB;
+     private static final int GB = MB * KB;
+-    private static final String symbol = "/s";
++    private static final String symbol = "/S";
+ 
+     private final int mWidth;
+ 
+@@ -247,11 +247,11 @@ public class NetworkTraffic extends TextView {
+     }
+ 
+     protected RelativeSizeSpan getSpeedRelativeSizeSpan() {
+-        return new RelativeSizeSpan(0.80f);
++        return new RelativeSizeSpan(0.78f);
+     }
+ 
+     protected RelativeSizeSpan getUnitRelativeSizeSpan() {
+-        return new RelativeSizeSpan(0.75f);
++        return new RelativeSizeSpan(0.70f);
+     }
+ 
+     private Runnable mRunnable = new Runnable() {
+@@ -352,7 +352,7 @@ public class NetworkTraffic extends TextView {
+ 
+     protected void setSpacingAndFonts() {
+         setTextAppearance(R.style.TextAppearance_QS_Status);
+-        setLineSpacing(0.80f, 0.80f);
++        setLineSpacing(0.88f, 0.88f);
+     }
+ 
+     public void onDensityOrFontScaleChanged() {
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
+index f6d36185ef67..2604c67e472a 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
+@@ -65,17 +65,17 @@ public class NetworkTrafficSB extends NetworkTraffic implements DarkReceiver, St
+     @Override
+     protected void setSpacingAndFonts() {
+         setTextAppearance(R.style.TextAppearance_QS_Status);
+-        setLineSpacing(0.75f, 0.75f);
++        setLineSpacing(0.83f, 0.83f);
+     }
+ 
+     @Override
+     protected RelativeSizeSpan getSpeedRelativeSizeSpan() {
+-        return new RelativeSizeSpan(0.75f);
++        return new RelativeSizeSpan(0.70f);
+     }
+ 
+     @Override
+     protected RelativeSizeSpan getUnitRelativeSizeSpan() {
+-        return new RelativeSizeSpan(0.7f);
++        return new RelativeSizeSpan(0.60f);
+     }
+ 
+     @Override
+-- 
+2.32.0
+

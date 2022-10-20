@@ -1,20 +1,19 @@
-From db6f21a7908ff9a206739f9bb03e73b968282eb6 Mon Sep 17 00:00:00 2001
+From 278e7da699496bb20502d966b5eee3ce3ae22ef1 Mon Sep 17 00:00:00 2001
 From: arrowos-gerrit <arrowos.contact@gmail.com>
-Date: Wed, 12 Oct 2022 16:15:39 +0000
+Date: Thu, 20 Oct 2022 09:27:54 +0000
 Subject: [PATCH] Importing Simplified Chinese Translations
 
-Change-Id: I346cdc404966ae545dbeaacba723a6a6833cb434
 ---
- res/values-zh-rCN/arrow_strings.xml | 82 +++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
+ res/values-zh-rCN/arrow_strings.xml | 106 ++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
  create mode 100644 res/values-zh-rCN/arrow_strings.xml
 
 diff --git a/res/values-zh-rCN/arrow_strings.xml b/res/values-zh-rCN/arrow_strings.xml
 new file mode 100644
-index 0000000000..a99142ff89
+index 0000000000..756bb5e93d
 --- /dev/null
 +++ b/res/values-zh-rCN/arrow_strings.xml
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,106 @@
 +<?xml version="1.0" encoding="utf-8"?>
 +<!-- Copyright (C) 2019 ArrowOS Project
 +
@@ -96,6 +95,30 @@ index 0000000000..a99142ff89
 +    <!-- Navigation bar hint -->
 +    <string name="show_navbar_gesture_bar_title">手势栏</string>
 +    <string name="show_navbar_gesture_bar_summary">在屏幕底部显示手势栏</string>
++
++    <!-- Network traffic -->
++    <string name="network_traffic_title">网络流量指示器</string>
++    <string name="network_traffic_summary">在状态栏中启用或禁用网络速度指示器</string>
++    <string name="network_traffic_state_title">启用“网络流量指示器”</string>
++    <string name="network_options_title">选项</string>
++    <string name="network_traffic_autohide_title">当网络处于非活动状态时隐藏网络流量指示器</string>
++    <string name="network_traffic_autohide_summary">当网络流量指示器小于 1 KB/s 时隐藏</string>
++    
++    <!-- Left volume panel -->
++    <string name="volume_panel_on_left_title">音量面板居左</string>
++    <string name="volume_panel_on_left_summary">在屏幕左侧显示音量面板</string>
++    
++    <!-- Torch Power button gestures -->
++    <string name="power_button_torch_title">关闭屏幕时开启手电筒</string>
++    <string name="power_button_torch_summary">当屏幕关闭时，长按电源按键将启用手电筒</string>
++    
++    <!-- DT2S on statusbar-->
++    <string name="double_tap_sleep_gesture_title">点按休眠</string>
++    <string name="double_tap_sleep_gesture_summary">双击状态栏的任何位置来关闭屏幕</string>
++    
++    <!-- Low battery light -->
++    <string name="low_battery_light_title">低电量时闪烁呼吸灯</string>
++    <string name="low_battery_light_summary">电池电量低时呼吸灯将持续闪烁</string>
 +</resources>
 -- 
 2.32.0
