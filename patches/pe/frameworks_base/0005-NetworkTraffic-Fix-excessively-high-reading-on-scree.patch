@@ -1,0 +1,32 @@
+From 2b754501e89c35f5ac62f5546522215250087aa0 Mon Sep 17 00:00:00 2001
+From: LibXZR <i@xzr.moe>
+Date: Sat, 18 Jun 2022 20:09:55 +0800
+Subject: [PATCH 3/7] NetworkTraffic: Fix excessively high reading on screen
+ wakeup
+
+lastUpdateTime should not be updated here as it will lead to wrong
+timeDelta. Update totalTxBytes here so data transmitted when screen
+off won't be taken into account.
+
+Change-Id: Ic2f39be197b3227811ddee4769c775ef7ffec605
+Signed-off-by: LibXZR <i@xzr.moe>
+---
+ .../com/android/systemui/statusbar/policy/NetworkTraffic.java   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
+index 6f4b474813db..72b484b3e946 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTraffic.java
+@@ -312,7 +312,7 @@ public class NetworkTraffic extends TextView {
+         if (mIsEnabled) {
+             if (mAttached) {
+                 totalRxBytes = TrafficStats.getTotalRxBytes();
+-                lastUpdateTime = SystemClock.elapsedRealtime();
++                totalTxBytes = TrafficStats.getTotalTxBytes();
+                 mTrafficHandler.sendEmptyMessage(1);
+             }
+             if (mAutoHideThreshold == 0)
+-- 
+2.32.0
+

@@ -1,0 +1,54 @@
+From bfa932ac11c4060b2feba7afc12d61615b795f19 Mon Sep 17 00:00:00 2001
+From: cjybyjk <cjybyjk@zjnu.edu.cn>
+Date: Fri, 21 Aug 2020 10:48:33 +0800
+Subject: [PATCH] Override name of Mainland China carriers
+
+Change-Id: I64b3b3d019a917147e1ee105cb95b2d22f3784b8
+---
+ assets/carrier_config_carrierid_1435_China-Mobile.xml  | 4 ++++
+ assets/carrier_config_carrierid_1436_China-Unicom.xml  | 4 ++++
+ assets/carrier_config_carrierid_2237_China-Telecom.xml | 4 ++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/assets/carrier_config_carrierid_1435_China-Mobile.xml b/assets/carrier_config_carrierid_1435_China-Mobile.xml
+index f5fae85..da3f129 100644
+--- a/assets/carrier_config_carrierid_1435_China-Mobile.xml
++++ b/assets/carrier_config_carrierid_1435_China-Mobile.xml
+@@ -6,4 +6,8 @@
+     <boolean name="allow_hold_video_call_bool" value="false" />
+     <boolean name="support_video_conference_call_bool" value="false"/>
+     <int name="default_mtu_int" value="1400"/>
++    <boolean name="carrier_name_override_bool" value="true" />
++    <string name="carrier_name_string">China Mobile</string>
++    <string name="carrier_name_string_zh-rCN">中国移动</string>
++    <string name="carrier_name_string_zh-rTW">中國移動</string>
+ </carrier_config>
+diff --git a/assets/carrier_config_carrierid_1436_China-Unicom.xml b/assets/carrier_config_carrierid_1436_China-Unicom.xml
+index dcef691..6ade1eb 100644
+--- a/assets/carrier_config_carrierid_1436_China-Unicom.xml
++++ b/assets/carrier_config_carrierid_1436_China-Unicom.xml
+@@ -1,4 +1,8 @@
+ <?xml version="1.0" encoding="utf-8" standalone="yes"?>
+ <carrier_config>
+     <boolean name="allow_emergency_numbers_in_call_log_bool" value="true"/>
++    <boolean name="carrier_name_override_bool" value="true" />
++    <string name="carrier_name_string">China Unicom</string>
++    <string name="carrier_name_string_zh-rCN">中国联通</string>
++    <string name="carrier_name_string_zh-rTW">中國聯通</string>
+ </carrier_config>
+diff --git a/assets/carrier_config_carrierid_2237_China-Telecom.xml b/assets/carrier_config_carrierid_2237_China-Telecom.xml
+index f398957..968a168 100644
+--- a/assets/carrier_config_carrierid_2237_China-Telecom.xml
++++ b/assets/carrier_config_carrierid_2237_China-Telecom.xml
+@@ -17,4 +17,8 @@
+         <item value="enterprise:20"/>
+         <item value="internet:20"/>
+     </string-array>
++    <boolean name="carrier_name_override_bool" value="true" />
++    <string name="carrier_name_string">China Telecom</string>
++    <string name="carrier_name_string_zh-rCN">中国电信</string>
++    <string name="carrier_name_string_zh-rTW">中國電信</string>
+ </carrier_config>
+-- 
+2.32.0
+

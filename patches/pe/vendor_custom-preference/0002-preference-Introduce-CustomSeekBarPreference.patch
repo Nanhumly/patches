@@ -1,0 +1,532 @@
+From bb8ac2b0b3c8e274ce3c7af9dd7981ceb30dd5f7 Mon Sep 17 00:00:00 2001
+From: piscesmk2013 <piscesmk2013@gmail.com>
+Date: Sun, 23 Oct 2022 21:30:52 +0800
+Subject: [PATCH 2/2] preference: Introduce CustomSeekBarPreference
+
+Change-Id: I4b3b409bf0b2a0c65d7e288818d9a5c32e31c77e
+---
+ res/layout/edit_dialog.xml                    |  34 ++
+ res/layout/preference_custom_seekbar.xml      |  91 +++++
+ res/values/attrs.xml                          |  11 +
+ res/values/strings.xml                        |  24 ++
+ .../preference/CustomSeekBarPreference.java   | 317 ++++++++++++++++++
+ 5 files changed, 477 insertions(+)
+ create mode 100644 res/layout/edit_dialog.xml
+ create mode 100644 res/layout/preference_custom_seekbar.xml
+ create mode 100644 res/values/strings.xml
+ create mode 100644 src/com/android/settings/custom/preference/CustomSeekBarPreference.java
+
+diff --git a/res/layout/edit_dialog.xml b/res/layout/edit_dialog.xml
+new file mode 100644
+index 0000000..bc8977e
+--- /dev/null
++++ b/res/layout/edit_dialog.xml
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     Copyright (C) 2017 Paranoid Android
++
++     Licensed under the Apache License, Version 2.0 (the "License");
++     you may not use this file except in compliance with the License.
++     You may obtain a copy of the License at
++
++          http://www.apache.org/licenses/LICENSE-2.0
++
++     Unless required by applicable law or agreed to in writing, software
++     distributed under the License is distributed on an "AS IS" BASIS,
++     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++     See the License for the specific language governing permissions and
++     limitations under the License.
++-->
++<LinearLayout
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="wrap_content"
++    android:layout_height="wrap_content"
++    android:baselineAligned="false"
++    android:padding="16dp">
++    <EditText
++        android:id="@+id/editText"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_marginStart="6dp"
++        android:layout_gravity="bottom"
++        android:ellipsize="end"
++        android:singleLine="true"
++        android:hint="@string/edit_hint"
++        android:textAppearance="?android:attr/textAppearanceMedium"
++        android:textAlignment="viewStart" />
++</LinearLayout>
+diff --git a/res/layout/preference_custom_seekbar.xml b/res/layout/preference_custom_seekbar.xml
+new file mode 100644
+index 0000000..a703f68
+--- /dev/null
++++ b/res/layout/preference_custom_seekbar.xml
+@@ -0,0 +1,91 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Copyright (C) 2014-2016 The Android Open Source Project
++
++     Licensed under the Apache License, Version 2.0 (the "License");
++     you may not use this file except in compliance with the License.
++     You may obtain a copy of the License at
++
++          http://www.apache.org/licenses/LICENSE-2.0
++
++     Unless required by applicable law or agreed to in writing, software
++     distributed under the License is distributed on an "AS IS" BASIS,
++     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++     See the License for the specific language governing permissions and
++     limitations under the License.
++-->
++
++<LinearLayout
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content"
++    android:minHeight="?android:attr/listPreferredItemHeightSmall"
++    android:gravity="center_vertical"
++    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
++    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
++    android:clickable="false"
++    android:orientation="horizontal">
++
++    <LinearLayout
++        android:id="@+id/text_container"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:minWidth="44dp"
++        android:gravity="center"
++        android:orientation="horizontal"
++        android:paddingTop="4dp"
++        android:paddingBottom="4dp">
++        <TextView
++            android:id="@+id/seekBarPrefValue"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:textAlignment="center"
++            android:singleLine="false"
++            android:ellipsize="end"
++            android:textAppearance="@android:style/TextAppearance.Material.Body1"
++            android:textColor="?android:attr/textColorSecondary"/>
++    </LinearLayout>
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="vertical"
++        android:layout_marginTop="8dip"
++        android:layout_marginBottom="8dip">
++
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content">
++            <TextView
++                android:id="@android:id/title"
++                android:layout_width="0dp"
++                android:layout_height="wrap_content"
++                android:layout_weight="1"
++                android:paddingStart="12dp"
++                android:singleLine="true"
++                android:textAppearance="@android:style/TextAppearance.Material.Subhead"
++                android:textColor="?android:attr/textColorPrimary"
++                android:ellipsize="marquee"
++                android:fadingEdge="horizontal"/>
++            <!-- Preference should place its actual preference widget here. -->
++            <LinearLayout
++                android:id="@android:id/widget_frame"
++                android:layout_width="wrap_content"
++                android:layout_height="match_parent"
++                android:gravity="end|center_vertical"
++                android:paddingStart="16dp"
++                android:orientation="vertical"/>
++        </LinearLayout>
++
++        <FrameLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:layout_marginTop="6dp">
++
++            <LinearLayout android:id="@+id/seekBarPrefBarContainer"
++                android:layout_gravity="center_vertical"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content" />
++        </FrameLayout>
++    </LinearLayout>
++
++</LinearLayout>
+diff --git a/res/values/attrs.xml b/res/values/attrs.xml
+index e6dc3a9..a857e64 100644
+--- a/res/values/attrs.xml
++++ b/res/values/attrs.xml
+@@ -27,4 +27,15 @@
+         <attr name="replacesKey" format="string" />
+         <attr name="minSummaryLines" format="integer" />
+     </declare-styleable>
++
++    <!-- Base attributes available to CustomSeekBarPreference. -->
++    <declare-styleable name="CustomSeekBarPreference">
++        <attr name="interval" format="integer" />
++        <attr name="min" format="integer" />
++        <attr name="units" format="string|reference" />
++        <attr name="unitsLeft" format="string|reference" />
++        <attr name="unitsRight" format="string|reference" />
++        <attr name="defaultText" format="string|reference" />
++        <attr name="allowEditText" format="boolean" />
++    </declare-styleable>
+ </resources>
+\ No newline at end of file
+diff --git a/res/values/strings.xml b/res/values/strings.xml
+new file mode 100644
+index 0000000..707d60f
+--- /dev/null
++++ b/res/values/strings.xml
+@@ -0,0 +1,24 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--  Copyright (C) 2014-2016 The Dirty Unicorns Project
++
++  This program is free software: you can redistribute it and/or modify
++  it under the terms of the GNU General Public License as published by
++  the Free Software Foundation, either version 3 of the License, or
++  (at your option) any later version.
++
++  This program is distributed in the hope that it will be useful,
++  but WITHOUT ANY WARRANTY; without even the implied warranty of
++  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++  GNU General Public License for more details.
++
++  You should have received a copy of the GNU General Public License
++  along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ -->
++
++<resources>
++    <string name="edit_hint">Value</string>
++    <string name="seek_value_edit_label">Set value</string>
++    <string name="dlg_ok">OK</string>
++    <string name="cancel">Cancel</string>
++    <string name="default_text">Default</string>
++</resources>
+diff --git a/src/com/android/settings/custom/preference/CustomSeekBarPreference.java b/src/com/android/settings/custom/preference/CustomSeekBarPreference.java
+new file mode 100644
+index 0000000..88c6d41
+--- /dev/null
++++ b/src/com/android/settings/custom/preference/CustomSeekBarPreference.java
+@@ -0,0 +1,317 @@
++/*
++ * Copyright (C) 2016 The Dirty Unicorns Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License
++ */
++
++package com.android.settings.custom.preference;
++
++import android.app.AlertDialog;
++import android.content.Context;
++import android.content.DialogInterface;
++import android.content.res.TypedArray;
++import android.text.InputType;
++import android.util.AttributeSet;
++import android.util.Log;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.view.ViewParent;
++import android.widget.EditText;
++import android.widget.SeekBar;
++import android.widget.TextView;
++
++import androidx.preference.*;
++
++import com.android.settings.custom.R;
++
++public class CustomSeekBarPreference extends Preference implements SeekBar.OnSeekBarChangeListener {
++    private final String TAG = getClass().getName();
++    private static final String SETTINGS_NS = "http://schemas.android.com/apk/res/com.android.settings";
++    private static final String ANDROIDNS = "http://schemas.android.com/apk/res/android";
++    private static final int DEFAULT_VALUE = 50;
++
++    private Context mContext;
++    private boolean mAllowEdit;
++    private View mTextContainer;
++    private int mMin = 0;
++    private int mInterval = 1;
++    private int mCurrentValue;
++    private int mDefaultValue = -1;
++    private int mMax = 100;
++    private String mUnits = "";
++    private String mDefaultText = "";
++    private SeekBar mSeekBar;
++    private TextView mTitle;
++    private TextView mStatusText;
++    private AlertDialog mEditValueDialog;
++
++    public CustomSeekBarPreference(Context context, AttributeSet attrs, int defStyleAttr,
++            int defStyleRes) {
++        super(context, attrs, defStyleAttr, defStyleRes);
++
++        mContext = context;
++        final TypedArray a = context.obtainStyledAttributes(
++                attrs, R.styleable.CustomSeekBarPreference);
++
++        mAllowEdit = attrs.getAttributeBooleanValue(null, "allowEditText", false);
++        mMax = attrs.getAttributeIntValue(ANDROIDNS, "max", 100);
++        mMin = attrs.getAttributeIntValue(SETTINGS_NS, "min", 0);
++        mDefaultValue = attrs.getAttributeIntValue(ANDROIDNS, "defaultValue", -1);
++        if (mDefaultValue > mMax) {
++            mDefaultValue = mMax;
++        }
++        mUnits = getAttributeStringValue(attrs, SETTINGS_NS, "units", "");
++        mDefaultText = getAttributeStringValue(attrs, SETTINGS_NS, "defaultText",
++                            context.getResources().getString(R.string.default_text));
++        Integer id = a.getResourceId(R.styleable.CustomSeekBarPreference_units, 0);
++        if (id > 0) {
++            mUnits = context.getResources().getString(id);
++        }
++        id = a.getResourceId(R.styleable.CustomSeekBarPreference_defaultText, 0);
++        if (id > 0) {
++            mDefaultText = context.getResources().getString(id);
++        }
++
++        try {
++            String newInterval = attrs.getAttributeValue(SETTINGS_NS, "interval");
++            if (newInterval != null)
++                mInterval = Integer.parseInt(newInterval);
++        } catch (Exception e) {
++            Log.e(TAG, "Invalid interval value", e);
++        }
++
++        a.recycle();
++        mSeekBar = new SeekBar(context, attrs);
++        mSeekBar.setMax(mMax - mMin);
++        mSeekBar.setOnSeekBarChangeListener(this);
++        setLayoutResource(R.layout.preference_custom_seekbar);
++    }
++
++    public CustomSeekBarPreference(Context context, AttributeSet attrs, int defStyleAttr) {
++        this(context, attrs, defStyleAttr, 0);
++    }
++
++    public CustomSeekBarPreference(Context context, AttributeSet attrs) {
++        this(context, attrs, 0);
++    }
++
++    public CustomSeekBarPreference(Context context) {
++        this(context, null);
++    }
++
++    private String getAttributeStringValue(AttributeSet attrs, String namespace, String name,
++            String defaultValue) {
++        String value = attrs.getAttributeValue(namespace, name);
++        if (value == null)
++            value = defaultValue;
++
++        return value;
++    }
++
++    @Override
++    public void onDependencyChanged(Preference dependency, boolean disableDependent) {
++        super.onDependencyChanged(dependency, disableDependent);
++        this.setShouldDisableView(true);
++        if (mTitle != null)
++            mTitle.setEnabled(!disableDependent);
++        if (mSeekBar != null)
++            mSeekBar.setEnabled(!disableDependent);
++        if (mStatusText != null)
++            mStatusText.setEnabled(!disableDependent);
++    }
++
++    @Override
++    public void onBindViewHolder(PreferenceViewHolder view) {
++        super.onBindViewHolder(view);
++        try
++        {
++            // move our seekbar to the new view we've been given
++            ViewParent oldContainer = mSeekBar.getParent();
++            ViewGroup newContainer = (ViewGroup) view.findViewById(R.id.seekBarPrefBarContainer);
++
++            if (oldContainer != newContainer) {
++                // remove the seekbar from the old view
++                if (oldContainer != null) {
++                    ((ViewGroup) oldContainer).removeView(mSeekBar);
++                }
++                // remove the existing seekbar (there may not be one) and add ours
++                newContainer.removeAllViews();
++                newContainer.addView(mSeekBar, ViewGroup.LayoutParams.FILL_PARENT,
++                        ViewGroup.LayoutParams.WRAP_CONTENT);
++            }
++        } catch (Exception ex) {
++            Log.e(TAG, "Error binding view: " + ex.toString());
++        }
++        mTextContainer = (View) view.findViewById(R.id.text_container);
++        mStatusText = (TextView) view.findViewById(R.id.seekBarPrefValue);
++        if (mCurrentValue == mDefaultValue) {
++            mStatusText.setText(mDefaultText);
++        } else {
++            mStatusText.setText(String.valueOf(mCurrentValue) + mUnits);
++        }
++
++        if (mAllowEdit) {
++            mTextContainer.setOnLongClickListener(new View.OnLongClickListener() {
++                @Override
++                public boolean onLongClick(View v) {
++                    showEditDialog();
++                    return true;
++                }
++            });
++        }
++
++        mSeekBar.setProgress(mCurrentValue - mMin);
++        mTitle = (TextView) view.findViewById(android.R.id.title);
++
++        view.setDividerAllowedAbove(false);
++        //view.setDividerAllowedBelow(false);
++
++        mSeekBar.setEnabled(isEnabled());
++    }
++
++    private void showEditDialog() {
++        LayoutInflater inflater = LayoutInflater.from(mContext);
++        View editDialogView = inflater.inflate(R.layout.edit_dialog, null);
++        EditText editText = editDialogView.findViewById(R.id.editText);
++        editText.setText(mStatusText.getText());
++        editText.setSelection(editText.getText().length());
++        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
++
++        AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
++                .setView(editDialogView)
++                .setTitle(mContext.getString(R.string.seek_value_edit_label))
++                .setPositiveButton(R.string.dlg_ok,
++                    new DialogInterface.OnClickListener() {
++                        @Override
++                        public void onClick(DialogInterface dialog, int which) {
++                            // check user value against min and max value
++                            final int userValue = Math.max(Integer.parseInt(editText.getText().toString()), mMin);
++                            final int valueToSet = Math.min(userValue, mMax);
++                            mEditValueDialog.dismiss();
++                            refresh(valueToSet);
++                        }
++                });
++                builder.setNeutralButton(R.string.cancel,
++                    new DialogInterface.OnClickListener() {
++                        @Override
++                        public void onClick(DialogInterface dialog, int which) {
++                            mEditValueDialog.dismiss();
++                        }
++                });
++        mEditValueDialog = builder.create();
++        mEditValueDialog.show();
++    }
++
++    public void setMax(int max) {
++        mMax = max;
++        mSeekBar.setMax(mMax - mMin);
++    }
++
++    public void setMin(int min) {
++        mMin = min;
++        mSeekBar.setMax(mMax - mMin);
++    }
++
++    public void setIntervalValue(int value) {
++        mInterval = value;
++    }
++
++    public void setValue(int value) {
++        mCurrentValue = value;
++    }
++
++    @Override
++    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
++        int newValue = progress + mMin;
++        if (newValue > mMax)
++            newValue = mMax;
++        else if (newValue < mMin)
++            newValue = mMin;
++        else if (mInterval != 1 && newValue % mInterval != 0)
++            newValue = Math.round(((float) newValue) / mInterval) * mInterval;
++
++        // change rejected, revert to the previous value
++        if (!callChangeListener(newValue)) {
++            seekBar.setProgress(mCurrentValue - mMin);
++            return;
++        }
++        // change accepted, store it
++        mCurrentValue = newValue;
++        if (mStatusText != null) {
++            if (newValue == mDefaultValue) {
++                mStatusText.setText(mDefaultText);
++            } else {
++                mStatusText.setText(String.valueOf(newValue) + mUnits);
++            }
++        }
++        persistInt(newValue);
++    }
++
++    public void refresh(int newValue) {
++        // this will trigger onProgressChanged and refresh everything
++        mSeekBar.setProgress(newValue - mMin);
++    }
++
++    @Override
++    public void onStartTrackingTouch(SeekBar seekBar) {
++    }
++
++    @Override
++    public void onStopTrackingTouch(SeekBar seekBar) {
++        notifyChanged();
++    }
++
++    @Override
++    protected Object onGetDefaultValue(TypedArray ta, int index) {
++        int defaultValue = ta.getInt(index, DEFAULT_VALUE);
++        return defaultValue;
++    }
++
++    @Override
++    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
++        if (restoreValue) {
++            mCurrentValue = getPersistedInt(mCurrentValue);
++        }
++        else {
++            int temp = 0;
++            try {
++                temp = (Integer) defaultValue;
++            } catch (Exception ex) {
++                Log.e(TAG, "Invalid default value: " + defaultValue.toString());
++            }
++            persistInt(temp);
++            mCurrentValue = temp;
++        }
++    }
++
++    public void setDefaultValue(int value) {
++        mDefaultValue = value;
++        if (mDefaultValue > mMax) {
++            mDefaultValue = mMax;
++        }
++        if (mCurrentValue == mDefaultValue && mStatusText != null) {
++            mStatusText.setText(mDefaultText);
++        }
++    }
++
++    @Override
++    public void setEnabled(boolean enabled) {
++        if (mSeekBar != null && mStatusText != null && mTitle != null) {
++            mSeekBar.setEnabled(enabled);
++            mStatusText.setEnabled(enabled);
++            mTitle.setEnabled(enabled);
++        }
++        super.setEnabled(enabled);
++    }
++}
+-- 
+2.32.0
+

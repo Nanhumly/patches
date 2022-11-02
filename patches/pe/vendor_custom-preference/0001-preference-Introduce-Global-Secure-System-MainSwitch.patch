@@ -1,0 +1,218 @@
+From af0cb1e7b63e88eefc6e894273f0c73906fd7f69 Mon Sep 17 00:00:00 2001
+From: bgcngm <>
+Date: Sat, 9 Jul 2022 05:40:56 +0000
+Subject: [PATCH 1/2] preference: Introduce
+ {Global,Secure,System}MainSwitchPreference
+
+Change-Id: I01e0f69569c7e024da7be3645de5096f34b3fac5
+---
+ Android.bp                                    |  1 +
+ .../GlobalSettingMainSwitchPreference.java    | 56 +++++++++++++++++++
+ .../SecureSettingMainSwitchPreference.java    | 56 +++++++++++++++++++
+ .../SystemSettingMainSwitchPreference.java    | 56 +++++++++++++++++++
+ 4 files changed, 169 insertions(+)
+ create mode 100644 src/com/android/settings/custom/preference/GlobalSettingMainSwitchPreference.java
+ create mode 100644 src/com/android/settings/custom/preference/SecureSettingMainSwitchPreference.java
+ create mode 100644 src/com/android/settings/custom/preference/SystemSettingMainSwitchPreference.java
+
+diff --git a/Android.bp b/Android.bp
+index 44295a6..fef96f1 100644
+--- a/Android.bp
++++ b/Android.bp
+@@ -13,6 +13,7 @@ android_library {
+         "androidx.preference_preference",
+         "androidx.appcompat_appcompat",
+         "androidx.recyclerview_recyclerview",
++        "SettingsLibMainSwitchPreference",
+     ],
+ 
+     resource_dirs: ["res"],
+diff --git a/src/com/android/settings/custom/preference/GlobalSettingMainSwitchPreference.java b/src/com/android/settings/custom/preference/GlobalSettingMainSwitchPreference.java
+new file mode 100644
+index 0000000..8dd2e9e
+--- /dev/null
++++ b/src/com/android/settings/custom/preference/GlobalSettingMainSwitchPreference.java
+@@ -0,0 +1,56 @@
++/*
++ * Copyright (C) 2021 The LineageOS Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.settings.custom.preference;
++
++import android.content.Context;
++import android.provider.Settings;
++import android.util.AttributeSet;
++
++import androidx.preference.PreferenceDataStore;
++
++import com.android.settingslib.widget.MainSwitchPreference;
++
++public class GlobalSettingMainSwitchPreference extends MainSwitchPreference {
++
++    public GlobalSettingMainSwitchPreference(Context context, AttributeSet attrs, int defStyle) {
++        super(context, attrs, defStyle);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    public GlobalSettingMainSwitchPreference(Context context, AttributeSet attrs) {
++        super(context, attrs);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    public GlobalSettingMainSwitchPreference(Context context) {
++        super(context, null);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    private class DataStore extends PreferenceDataStore {
++        @Override
++        public void putBoolean(String key, boolean value) {
++            Settings.Global.putInt(getContext().getContentResolver(), key, value ? 1 : 0);
++        }
++
++        @Override
++        public boolean getBoolean(String key, boolean defaultValue) {
++            return Settings.Global.getInt(getContext().getContentResolver(), key,
++                    defaultValue ? 1 : 0) != 0;
++        }
++    }
++}
+diff --git a/src/com/android/settings/custom/preference/SecureSettingMainSwitchPreference.java b/src/com/android/settings/custom/preference/SecureSettingMainSwitchPreference.java
+new file mode 100644
+index 0000000..d5b3653
+--- /dev/null
++++ b/src/com/android/settings/custom/preference/SecureSettingMainSwitchPreference.java
+@@ -0,0 +1,56 @@
++/*
++ * Copyright (C) 2021 The LineageOS Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.settings.custom.preference;
++
++import android.content.Context;
++import android.provider.Settings;
++import android.util.AttributeSet;
++
++import androidx.preference.PreferenceDataStore;
++
++import com.android.settingslib.widget.MainSwitchPreference;
++
++public class SecureSettingMainSwitchPreference extends MainSwitchPreference {
++
++    public SecureSettingMainSwitchPreference(Context context, AttributeSet attrs, int defStyle) {
++        super(context, attrs, defStyle);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    public SecureSettingMainSwitchPreference(Context context, AttributeSet attrs) {
++        super(context, attrs);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    public SecureSettingMainSwitchPreference(Context context) {
++        super(context, null);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    private class DataStore extends PreferenceDataStore {
++        @Override
++        public void putBoolean(String key, boolean value) {
++            Settings.Secure.putInt(getContext().getContentResolver(), key, value ? 1 : 0);
++        }
++
++        @Override
++        public boolean getBoolean(String key, boolean defaultValue) {
++            return Settings.Secure.getInt(getContext().getContentResolver(), key,
++                    defaultValue ? 1 : 0) != 0;
++        }
++    }
++}
+diff --git a/src/com/android/settings/custom/preference/SystemSettingMainSwitchPreference.java b/src/com/android/settings/custom/preference/SystemSettingMainSwitchPreference.java
+new file mode 100644
+index 0000000..837ac5a
+--- /dev/null
++++ b/src/com/android/settings/custom/preference/SystemSettingMainSwitchPreference.java
+@@ -0,0 +1,56 @@
++/*
++ * Copyright (C) 2021 The LineageOS Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.settings.custom.preference;
++
++import android.content.Context;
++import android.provider.Settings;
++import android.util.AttributeSet;
++
++import androidx.preference.PreferenceDataStore;
++
++import com.android.settingslib.widget.MainSwitchPreference;
++
++public class SystemSettingMainSwitchPreference extends MainSwitchPreference {
++
++    public SystemSettingMainSwitchPreference(Context context, AttributeSet attrs, int defStyle) {
++        super(context, attrs, defStyle);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    public SystemSettingMainSwitchPreference(Context context, AttributeSet attrs) {
++        super(context, attrs);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    public SystemSettingMainSwitchPreference(Context context) {
++        super(context, null);
++        setPreferenceDataStore(new DataStore());
++    }
++
++    private class DataStore extends PreferenceDataStore {
++        @Override
++        public void putBoolean(String key, boolean value) {
++            Settings.System.putInt(getContext().getContentResolver(), key, value ? 1 : 0);
++        }
++
++        @Override
++        public boolean getBoolean(String key, boolean defaultValue) {
++            return Settings.System.getInt(getContext().getContentResolver(), key,
++                    defaultValue ? 1 : 0) != 0;
++        }
++    }
++}
+-- 
+2.32.0
+
