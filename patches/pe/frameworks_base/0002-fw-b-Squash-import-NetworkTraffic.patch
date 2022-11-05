@@ -1,4 +1,4 @@
-From 2c5b33d3de051ce13c8e61685aa1aebd7e5003a1 Mon Sep 17 00:00:00 2001
+From 643897c9919578a04d8ba3736127e2d28068d5a6 Mon Sep 17 00:00:00 2001
 From: Jon Haus <haus.xda@gmail.com>
 Date: Thu, 5 Jan 2017 00:20:06 +0100
 Subject: [PATCH 1/7] fw/b: Squash import NetworkTraffic
@@ -215,10 +215,10 @@ Change-Id: Ifd903896dd624340425ff26df21ae22700a54b49
  create mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/policy/NetworkTrafficSB.java
 
 diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
-index dc337e678530..aa853438c65c 100644
+index b366a7e25110..7177d7597efb 100644
 --- a/core/java/android/provider/Settings.java
 +++ b/core/java/android/provider/Settings.java
-@@ -5519,6 +5519,18 @@ public final class Settings {
+@@ -5667,6 +5667,18 @@ public final class Settings {
           * the setting value. See an example above.
           */
  
@@ -249,17 +249,18 @@ index a6bfc408be7e..49a3e5944bf9 100644
      };
  }
 diff --git a/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java b/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
-index 4ed5652b5983..1330a5907894 100644
+index eff688b60fb7..ea71ce150523 100644
 --- a/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
 +++ b/packages/SettingsProvider/src/android/provider/settings/validators/SystemSettingsValidators.java
-@@ -208,5 +208,7 @@ public class SystemSettingsValidators {
+@@ -208,6 +208,8 @@ public class SystemSettingsValidators {
          VALIDATORS.put(System.SHOW_BATTERY_PERCENT, BOOLEAN_VALIDATOR);
          VALIDATORS.put(System.NOTIFICATION_LIGHT_PULSE, BOOLEAN_VALIDATOR);
          VALIDATORS.put(System.FINGERPRINT_WAKE_UNLOCK, NON_NEGATIVE_INTEGER_VALIDATOR);
 +        VALIDATORS.put(System.NETWORK_TRAFFIC_STATE, BOOLEAN_VALIDATOR);
 +        VALIDATORS.put(System.NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD, BOOLEAN_VALIDATOR);
-     }
- }
+         VALIDATORS.put(System.BUTTON_BACKLIGHT_ONLY_WHEN_PRESSED, BOOLEAN_VALIDATOR);
+         VALIDATORS.put(System.NAVIGATION_BAR_SHOW, BOOLEAN_VALIDATOR);
+         VALIDATORS.put(System.NAVIGATION_BAR_MODE_OVERLAY, ANY_STRING_VALIDATOR);
 diff --git a/packages/SystemUI/res/drawable/stat_sys_network_traffic_updown.xml b/packages/SystemUI/res/drawable/stat_sys_network_traffic_updown.xml
 new file mode 100644
 index 000000000000..4e0b63ceffe4

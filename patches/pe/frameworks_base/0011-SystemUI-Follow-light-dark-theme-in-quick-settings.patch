@@ -1,4 +1,4 @@
-From 1c473d2bd3b38d5a77416710dd0fc20326f25eef Mon Sep 17 00:00:00 2001
+From b07735e4d495da703b0d9df2e9dac41b918f8dac Mon Sep 17 00:00:00 2001
 From: Danny Lin <danny@kdrag0n.dev>
 Date: Mon, 11 Oct 2021 19:24:58 -0700
 Subject: [PATCH 03/12] SystemUI: Follow light/dark theme in quick settings
@@ -158,7 +158,7 @@ index 5e7dc115d7f9..473998575ced 100644
                  mBehindAlpha = behindAlpha;
                  if (mState == ScrimState.SHADE_LOCKED) {
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimState.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimState.java
-index 4a5f712d587c..c767de649be8 100644
+index b447f0d36c10..8b70b46f3a07 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimState.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimState.java
 @@ -82,7 +82,7 @@ public enum ScrimState {
@@ -208,7 +208,7 @@ index 4a5f712d587c..c767de649be8 100644
 +            mBehindTint = Color.TRANSPARENT;
              mBlankScreen = false;
  
-             if (previousState == ScrimState.AOD) {
+             if (mDisplayRequiresBlanking && previousState == ScrimState.AOD) {
                  // Set all scrims black, before they fade transparent.
                  updateScrimColor(mScrimInFront, 1f /* alpha */, Color.BLACK /* tint */);
 -                updateScrimColor(mScrimBehind, 1f /* alpha */, Color.BLACK /* tint */);
