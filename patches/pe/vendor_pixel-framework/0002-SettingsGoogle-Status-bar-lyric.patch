@@ -1,0 +1,32 @@
+From 493aeab6dd0ac70f8bc05d6a7c7823ea62eee80c Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Fri, 4 Nov 2022 03:01:53 +0000
+Subject: [PATCH] SettingsGoogle: Status bar lyric
+
+Change-Id: I5059699cc8e95e70d69d0c9783157886b1eda9fd
+---
+ SettingsGoogle/res/xml/display_settings.xml | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/SettingsGoogle/res/xml/display_settings.xml b/SettingsGoogle/res/xml/display_settings.xml
+index 49927bf..4912edb 100644
+--- a/SettingsGoogle/res/xml/display_settings.xml
++++ b/SettingsGoogle/res/xml/display_settings.xml
+@@ -97,7 +97,13 @@
+             android:fragment="com.android.settings.fragments.NetworkTrafficSettings"
+             android:title="@string/network_traffic_title"
+             android:summary="@string/network_traffic_summary"/>
+-            
++
++	    <Preference
++	        android:key="status_bar_lyric_settings"
++	        android:fragment="com.android.settings.fragments.StatusbarLyricSettings"
++	        android:title="@string/status_bar_lyric_title"
++	        android:summary="@string/status_bar_lyric_summary"/>
++
+         <com.android.settingslib.PrimarySwitchPreference
+             android:fragment="com.android.settings.display.SmartAutoRotatePreferenceFragment"
+             android:key="auto_rotate"
+-- 
+2.32.0
+

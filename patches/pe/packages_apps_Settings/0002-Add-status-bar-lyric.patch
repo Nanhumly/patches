@@ -1,0 +1,145 @@
+From 1405d938c7b3b761c453a57dd3273d6e1b1871b8 Mon Sep 17 00:00:00 2001
+From: Kujou Yuko <i@779.moe>
+Date: Thu, 4 Aug 2022 01:35:52 +0000
+Subject: [PATCH] Add status bar lyric
+
+Change-Id: I944afb9e961eee72ce7fd183f2a97a9210f6c35a
+---
+ res/values-zh-rCN/custom_strings.xml          |  4 ++
+ res/values/custom_strings.xml                 |  6 +++
+ res/xml/display_settings.xml                  |  6 +++
+ res/xml/status_bar_lyric_settings.xml         | 27 +++++++++++++
+ .../fragments/StatusbarLyricSettings.java     | 40 +++++++++++++++++++
+ 5 files changed, 83 insertions(+)
+ create mode 100644 res/xml/status_bar_lyric_settings.xml
+ create mode 100644 src/com/android/settings/fragments/StatusbarLyricSettings.java
+
+diff --git a/res/values-zh-rCN/custom_strings.xml b/res/values-zh-rCN/custom_strings.xml
+index a7c49628c9..96b8660c68 100644
+--- a/res/values-zh-rCN/custom_strings.xml
++++ b/res/values-zh-rCN/custom_strings.xml
+@@ -22,4 +22,8 @@
+     <string name="network_options_title">选项</string>
+     <string name="network_traffic_autohide_title">不活动时隐藏网络速率指示器</string>
+     <string name="network_traffic_autohide_summary">当网络速率低于 1 KB/s 时隐藏</string>
++    <string name="status_bar_lyric_title">状态栏歌词</string>
++    <string name="status_bar_lyric_summary">状态栏歌词（需要应用支持）</string>
++    <string name="status_bar_show_lyric_title">启用状态栏歌词</string>
++    <string name="status_bar_show_lyric_summary">感谢Shelling和AmeChan的贡献~</string>
+ </resources>
+diff --git a/res/values/custom_strings.xml b/res/values/custom_strings.xml
+index 9b0f82e986..4eef6a2cfb 100644
+--- a/res/values/custom_strings.xml
++++ b/res/values/custom_strings.xml
+@@ -38,6 +38,12 @@
+     <!-- Summary text for screen off UDFPS [CHAR LIMIT=NONE]-->
+     <string name="ambient_display_screen_off_udfps_summary">To wake up your screen and unlock, long press your under-display fingerprint sensor.</string>
+ 
++    <!-- StatusBar Lyric -->
++    <string name="status_bar_lyric_title">Status bar lyric</string>
++    <string name="status_bar_lyric_summary">Show lyric in status bar (need app support)</string>
++    <string name="status_bar_show_lyric_title">Enable status bar lyric</string>
++    <string name="status_bar_show_lyric_summary">Show lyric in status bar. Thanks to @cjybyjk and @AmeChanRain! (from @exTHmUI)</string>
++    
+     <!-- Warning message for the sd card setup -->
+     <string name="storage_warning_internal">Warning: This option may not work properly or lead to data loss and is therefore not recommended!</string>
+ 
+diff --git a/res/xml/display_settings.xml b/res/xml/display_settings.xml
+index a52bf11805..c5df04ce70 100644
+--- a/res/xml/display_settings.xml
++++ b/res/xml/display_settings.xml
+@@ -103,6 +103,12 @@
+             android:title="@string/network_traffic_title"
+             android:summary="@string/network_traffic_summary"/>
+ 
++	    <Preference
++	        android:key="status_bar_lyric_settings"
++	        android:fragment="com.android.settings.fragments.StatusbarLyricSettings"
++	        android:title="@string/status_bar_lyric_title"
++	        android:summary="@string/status_bar_lyric_summary"/>
++	 
+         <!--
+             Standard auto-rotation preference that will be shown when device state based
+             auto-rotation settings are NOT available.
+diff --git a/res/xml/status_bar_lyric_settings.xml b/res/xml/status_bar_lyric_settings.xml
+new file mode 100644
+index 0000000000..d88b5862ac
+--- /dev/null
++++ b/res/xml/status_bar_lyric_settings.xml
+@@ -0,0 +1,27 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++     Copyright (C) 2022 Project Kaleidoscope
++     
++     Licensed under the Apache License, Version 2.0 (the "License");
++     you may not use this file except in compliance with the License.
++     You may obtain a copy of the License at
++     
++          http://www.apache.org/licenses/LICENSE-2.0
++          
++     Unless required by applicable law or agreed to in writing, software
++     distributed under the License is distributed on an "AS IS" BASIS,
++     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++     See the License for the specific language governing permissions and
++     limitations under the License.
++-->
++<PreferenceScreen
++    android:title="@string/status_bar_lyric_title"
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:settings="http://schemas.android.com/apk/res/com.android.settings">
++
++    <com.android.settings.custom.preference.SecureSettingSwitchPreference
++        android:key="status_bar_show_lyric"
++        android:title="@string/status_bar_show_lyric_title"
++        android:summary="@string/status_bar_show_lyric_summary"
++        android:defaultValue="false"/>
++</PreferenceScreen>
+diff --git a/src/com/android/settings/fragments/StatusbarLyricSettings.java b/src/com/android/settings/fragments/StatusbarLyricSettings.java
+new file mode 100644
+index 0000000000..8c21fbad88
+--- /dev/null
++++ b/src/com/android/settings/fragments/StatusbarLyricSettings.java
+@@ -0,0 +1,40 @@
++/*
++ * Copyright (C) 2022 Project Kaleidoscope
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.settings.fragments;
++
++import android.os.Bundle;
++
++import androidx.preference.Preference;
++
++import com.android.internal.logging.nano.MetricsProto;
++
++import com.android.settings.R;
++import com.android.settings.SettingsPreferenceFragment;
++
++public class StatusbarLyricSettings extends SettingsPreferenceFragment {
++
++    @Override
++    public void onCreate(Bundle icicle) {
++        super.onCreate(icicle);
++        addPreferencesFromResource(R.xml.status_bar_lyric_settings);
++    }
++
++    @Override
++    public int getMetricsCategory() {
++        return MetricsProto.MetricsEvent.CUSTOM_SETTINGS;
++    }
++}
+-- 
+2.32.0
+
