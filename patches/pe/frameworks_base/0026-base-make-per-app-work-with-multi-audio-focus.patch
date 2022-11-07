@@ -1,0 +1,72 @@
+From 5890eba099a278b296a238a5539391d34bb35c9e Mon Sep 17 00:00:00 2001
+From: El Dainosor <eldainosor@gmail.com>
+Date: Wed, 3 Aug 2022 10:07:13 -0300
+Subject: [PATCH] base: make per-app work with multi audio focus
+
+Seems like Google merged this for OEMs to make their own take on multi-audio
+focus, so we'll do an oem approach to make it work with per-app volume.
+This will allow the adjustment of various app volumes at the same time
+instead of leaving it to just enable the volume for just one app :)
+
+Change-Id: I30966f6b95bdb03f139a9b2d1b7b30dbebb7a357
+---
+ .../server/audio/MediaFocusControl.java       | 26 +++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/services/core/java/com/android/server/audio/MediaFocusControl.java b/services/core/java/com/android/server/audio/MediaFocusControl.java
+index 69a4c23cf867..7838cae0d593 100644
+--- a/services/core/java/com/android/server/audio/MediaFocusControl.java
++++ b/services/core/java/com/android/server/audio/MediaFocusControl.java
+@@ -21,6 +21,7 @@ import android.annotation.Nullable;
+ import android.app.AppOpsManager;
+ import android.content.ContentResolver;
+ import android.content.Context;
++import android.database.ContentObserver;
+ import android.media.AudioAttributes;
+ import android.media.AudioFocusInfo;
+ import android.media.AudioManager;
+@@ -101,13 +102,15 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
+     @GuardedBy("mExtFocusChangeLock")
+     private long mExtFocusChangeCounter;
+ 
++    // Observer to work with per-app volume
++    private SettingsObserver mSettingsObserver;
++
+     protected MediaFocusControl(Context cntxt, PlayerFocusEnforcer pfe) {
+         mContext = cntxt;
+         mAppOps = (AppOpsManager)mContext.getSystemService(Context.APP_OPS_SERVICE);
+         mFocusEnforcer = pfe;
+         final ContentResolver cr = mContext.getContentResolver();
+-        mMultiAudioFocusEnabled = Settings.System.getIntForUser(cr,
+-                Settings.System.MULTI_AUDIO_FOCUS_ENABLED, 0, cr.getUserId()) != 0;
++        mSettingsObserver = new SettingsObserver();
+         initFocusThreading();
+     }
+ 
+@@ -1355,4 +1358,23 @@ public class MediaFocusControl implements PlayerFocusEnforcer {
+             return mUid;
+         }
+     }
++
++    private class SettingsObserver extends ContentObserver {
++
++        SettingsObserver() {
++            super(new Handler());
++            ContentResolver cr = mContext.getContentResolver();
++            cr.registerContentObserver(Settings.System.getUriFor(
++                Settings.System.SHOW_APP_VOLUME), true, this);
++        }
++
++        @Override
++        public void onChange(boolean selfChange) {
++            super.onChange(selfChange);
++            ContentResolver cr = mContext.getContentResolver();
++            mMultiAudioFocusEnabled = Settings.System.getIntForUser(cr,
++                    Settings.System.SHOW_APP_VOLUME, 1, cr.getUserId()) != 0;
++            updateMultiAudioFocus(mMultiAudioFocusEnabled);
++        }
++    }
+ }
+-- 
+2.32.0
+

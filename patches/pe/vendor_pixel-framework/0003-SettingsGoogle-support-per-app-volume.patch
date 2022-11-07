@@ -1,0 +1,31 @@
+From ec14d446b452f49290b5fa8dfb57a6c2935eac41 Mon Sep 17 00:00:00 2001
+From: Nanhumly <1607616422@qq.com>
+Date: Mon, 7 Nov 2022 15:47:39 +0000
+Subject: [PATCH] SettingsGoogle: support per-app volume
+
+Change-Id: Idac98b9357592b90c3dda577f41112af8571e7ce
+---
+ SettingsGoogle/res/xml/sound_settings.xml | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/SettingsGoogle/res/xml/sound_settings.xml b/SettingsGoogle/res/xml/sound_settings.xml
+index 32ef432..8b096a5 100644
+--- a/SettingsGoogle/res/xml/sound_settings.xml
++++ b/SettingsGoogle/res/xml/sound_settings.xml
+@@ -121,6 +121,13 @@
+         android:title="@string/gesture_prevent_ringing_sound_title"
+         settings:controller="com.android.settings.gestures.PreventRingingParentPreferenceController" />
+ 
++    <com.android.settings.custom.preference.SystemSettingSwitchPreference
++        android:key="show_app_volume"
++        android:title="@string/app_volume_title"
++        android:summary="@string/app_volume_summary"
++        android:defaultValue="false"
++        android:order="-5"/>
++        
+     <com.android.settings.DefaultRingtonePreference
+         android:dialogTitle="@string/notification_ringtone_title"
+         android:key="notification_ringtone"
+-- 
+2.32.0
+

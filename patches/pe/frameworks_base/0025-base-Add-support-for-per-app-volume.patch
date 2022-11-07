@@ -1,0 +1,520 @@
+From fce50a470de4333467c0a6eeb627613914acd337 Mon Sep 17 00:00:00 2001
+From: cjybyjk <cjybyjk@zjnu.edu.cn>
+Date: Sun, 6 Nov 2022 07:43:41 +0000
+Subject: [PATCH] base: Add support for per-app volume [2/3]
+
+[ghostrider-reborn]
+- Use app volume icon by amartya (@ yukiscape)
+
+[@npv12 adapt for A13]
+
+Change-Id: I674cda1d7463b3603ccaac673178aeead4093619
+Co-authored-by: yukiscape <garikapatiamartya@gmail.com>
+Signed-off-by: chrisw444 <wandersonrodriguesf1@gmail.com>
+Signed-off-by: Adithya R <gh0strider.2k18.reborn@gmail.com>
+---
+ core/java/android/provider/Settings.java      |  12 +++
+ core/jni/android_media_AudioSystem.cpp        | 101 +++++++++++++++++-
+ media/java/android/media/AppVolume.java       |  53 +++++++++
+ media/java/android/media/AudioManager.java    |  26 +++++
+ media/java/android/media/AudioSystem.java     |   7 ++
+ .../SystemUI/res/drawable/ic_app_volume.xml   |  16 +++
+ .../res/drawable/volume_background.xml        |  22 ++++
+ .../res/layout-land/volume_dialog.xml         |  18 ++++
+ .../SystemUI/res/layout/volume_dialog.xml     |  18 ++++
+ .../systemui/volume/VolumeDialogImpl.java     |  42 ++++++++
+ 10 files changed, 314 insertions(+), 1 deletion(-)
+ create mode 100644 media/java/android/media/AppVolume.java
+ create mode 100644 packages/SystemUI/res/drawable/ic_app_volume.xml
+ create mode 100644 packages/SystemUI/res/drawable/volume_background.xml
+
+diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
+index 9fdea74d21b8..4fd78faf1a89 100644
+--- a/core/java/android/provider/Settings.java
++++ b/core/java/android/provider/Settings.java
+@@ -5887,6 +5887,12 @@ public final class Settings {
+             INSTANT_APP_SETTINGS.add(ACCELEROMETER_ROTATION);
+         }
+ 
++        /**
++         * Show app volume rows in volume panel
++         * @hide
++         */
++        public static final String SHOW_APP_VOLUME = "show_app_volume";
++        
+         /**
+          * When to use Wi-Fi calling
+          *
+@@ -18374,6 +18380,12 @@ public final class Settings {
+         @SdkConstant(SdkConstant.SdkConstantType.ACTIVITY_INTENT_ACTION)
+         public static final String ACTION_VOLUME =
+                 "android.settings.panel.action.VOLUME";
++                
++        /**
++         * @hide
++         */
++        public static final String ACTION_APP_VOLUME =
++                "android.settings.panel.action.APP_VOLUME";
+     }
+ 
+     /**
+diff --git a/core/jni/android_media_AudioSystem.cpp b/core/jni/android_media_AudioSystem.cpp
+index f24c66695052..156dadc8dda4 100644
+--- a/core/jni/android_media_AudioSystem.cpp
++++ b/core/jni/android_media_AudioSystem.cpp
+@@ -37,6 +37,7 @@
+ #include <sstream>
+ #include <vector>
+ 
++#include <media/AppVolume.h>
+ #include "android_media_AudioAttributes.h"
+ #include "android_media_AudioDescriptor.h"
+ #include "android_media_AudioDeviceAttributes.h"
+@@ -193,6 +194,9 @@ static struct {
+ static jclass gAudioDescriptorClass;
+ static jmethodID gAudioDescriptorCstor;
+ 
++static jclass gAppVolumeClass;
++static jmethodID gAppVolumeCstor;
++
+ //
+ // JNI Initialization for OpenSLES routing
+ //
+@@ -843,6 +847,90 @@ android_media_AudioSystem_getMasterBalance(JNIEnv *env, jobject thiz)
+     return balance;
+ }
+ 
++static jint
++android_media_AudioSystem_setAppVolume(JNIEnv *env, jobject thiz, jstring packageName, jfloat value)
++{
++    const jchar* c_packageName = env->GetStringCritical(packageName, 0);
++    String8 package8 = String8(reinterpret_cast<const char16_t*>(c_packageName),
++                                    env->GetStringLength(packageName));
++    env->ReleaseStringCritical(packageName, c_packageName);
++    return (jint) check_AudioSystem_Command(AudioSystem::setAppVolume(package8, value));
++}
++
++static jint
++android_media_AudioSystem_setAppMute(JNIEnv *env, jobject thiz, jstring packageName, jboolean mute)
++{
++    const jchar* c_packageName = env->GetStringCritical(packageName, 0);
++    String8 package8 = String8(reinterpret_cast<const char16_t*>(c_packageName),
++                                    env->GetStringLength(packageName));
++    env->ReleaseStringCritical(packageName, c_packageName);
++    return (jint) check_AudioSystem_Command(AudioSystem::setAppMute(package8, mute));
++}
++
++jint convertAppVolumeFromNative(JNIEnv *env, jobject *jAppVolume, const media::AppVolume *AppVolume)
++{
++    jint jStatus = (jint)AUDIO_JAVA_SUCCESS;
++    jstring jPackageName;
++    jfloat jVolume;
++    jboolean jMute;
++    jboolean jActive;
++
++    if (AppVolume == NULL || jAppVolume == NULL) {
++        jStatus = (jint)AUDIO_JAVA_ERROR;
++        goto exit;
++    }
++
++    jPackageName = env->NewStringUTF(AppVolume->packageName);
++    jVolume = AppVolume->volume;
++    jMute =  AppVolume->muted;
++    jActive = AppVolume->active;
++
++    *jAppVolume = env->NewObject(gAppVolumeClass, gAppVolumeCstor,
++                                jPackageName, jMute, jVolume, jActive);
++
++    env->DeleteLocalRef(jPackageName);
++exit:
++    return jStatus;
++}
++
++static jint
++android_media_AudioSystem_listAppVolumes(JNIEnv *env, jobject clazz, jobject jVolumes)
++{
++    ALOGV("listAppVolumes");
++
++    if (jVolumes == NULL) {
++        ALOGE("listAppVolumes NULL AppVolume ArrayList");
++        return (jint)AUDIO_JAVA_BAD_VALUE;
++    }
++    if (!env->IsInstanceOf(jVolumes, gArrayListClass)) {
++        ALOGE("listAppVolumes not an arraylist");
++        return (jint)AUDIO_JAVA_BAD_VALUE;
++    }
++
++    std::vector<media::AppVolume> volumes;
++
++    jint jStatus = (jint)AUDIO_JAVA_SUCCESS;
++    status_t status = AudioSystem::listAppVolumes(&volumes);
++
++    if (status != NO_ERROR) {
++        ALOGE("AudioSystem::listAppVolumes error %d", status);
++        jStatus = nativeToJavaStatus(status);
++        return jStatus;
++    }
++
++    for (size_t i = 0; i < volumes.size(); i++) {
++        jobject jAppVolume;
++        jStatus = convertAppVolumeFromNative(env, &jAppVolume, &volumes[i]);
++        if (jStatus != AUDIO_JAVA_SUCCESS) {
++            return jStatus;
++        }
++        env->CallBooleanMethod(jVolumes, gArrayListMethods.add, jAppVolume);
++        env->DeleteLocalRef(jAppVolume);
++    }
++
++    return jStatus;
++}
++
+ static jint
+ android_media_AudioSystem_getPrimaryOutputSamplingRate(JNIEnv *env, jobject clazz)
+ {
+@@ -3103,7 +3191,13 @@ static const JNINativeMethod gMethods[] =
+           (void *)android_media_AudioSystem_getDirectPlaybackSupport},
+          {"getDirectProfilesForAttributes",
+           "(Landroid/media/AudioAttributes;Ljava/util/ArrayList;)I",
+-          (void *)android_media_AudioSystem_getDirectProfilesForAttributes}};
++          (void *)android_media_AudioSystem_getDirectProfilesForAttributes},
++         {"setAppVolume", "(Ljava/lang/String;F)I",
++          (void *)android_media_AudioSystem_setAppVolume},
++         {"setAppMute", "(Ljava/lang/String;Z)I",
++          (void *)android_media_AudioSystem_setAppMute},
++         {"listAppVolumes", "(Ljava/util/ArrayList;)I",
++          (void *)android_media_AudioSystem_listAppVolumes}};
+ 
+ static const JNINativeMethod gEventHandlerMethods[] = {
+     {"native_setup",
+@@ -3342,6 +3436,11 @@ int register_android_media_AudioSystem(JNIEnv *env)
+     gVibratorMethods.getMaxAmplitude =
+             GetMethodIDOrDie(env, vibratorClass, "getHapticChannelMaximumAmplitude", "()F");
+ 
++    jclass AppVolumeClass = FindClassOrDie(env, "android/media/AppVolume");
++    gAppVolumeClass = MakeGlobalRefOrDie(env, AppVolumeClass);
++    gAppVolumeCstor = GetMethodIDOrDie(env, AppVolumeClass, "<init>",
++            "(Ljava/lang/String;ZFZ)V");
++
+     AudioSystem::addErrorCallback(android_media_AudioSystem_error_callback);
+ 
+     RegisterMethodsOrDie(env, kClassPathName, gMethods, NELEM(gMethods));
+diff --git a/media/java/android/media/AppVolume.java b/media/java/android/media/AppVolume.java
+new file mode 100644
+index 000000000000..07e3c6c2fbbe
+--- /dev/null
++++ b/media/java/android/media/AppVolume.java
+@@ -0,0 +1,53 @@
++/*
++ * Copyright (C) 2022 Project Kaleidoscope
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package android.media;
++
++import android.annotation.NonNull;
++
++/**
++ * @hide
++ */
++public class AppVolume {
++    private final String mPackageName;
++    private final float mVolume;
++    private final boolean mMute;
++    private final boolean mActive;
++
++    AppVolume(String packageName, boolean mute, float volume, boolean active) {
++        mPackageName = packageName;
++        mMute = mute;
++        mVolume = volume;
++        mActive = active;
++    }
++
++    @NonNull
++    public String getPackageName() {
++        return mPackageName;
++    }
++
++    public float getVolume() {
++        return mVolume;
++    }
++
++    public boolean isMuted() {
++        return mMute;
++    }
++
++    public boolean isActive() {
++        return mActive;
++    }
++}
+diff --git a/media/java/android/media/AudioManager.java b/media/java/android/media/AudioManager.java
+index e7eda3ea4552..03946768683d 100644
+--- a/media/java/android/media/AudioManager.java
++++ b/media/java/android/media/AudioManager.java
+@@ -1036,6 +1036,32 @@ public class AudioManager {
+         }
+     }
+ 
++    /** @hide */
++    @UnsupportedAppUsage
++    @RequiresPermission(android.Manifest.permission.MODIFY_AUDIO_ROUTING)
++    public int setAppVolume(String packageName, float volume) {
++        return AudioSystem.setAppVolume(packageName, volume);
++    }
++
++    /** @hide */
++    @UnsupportedAppUsage
++    @RequiresPermission(android.Manifest.permission.MODIFY_AUDIO_ROUTING)
++    public int setAppMute(String packageName, boolean mute) {
++        return AudioSystem.setAppMute(packageName, mute);
++    }
++
++    /** @hide */
++    @UnsupportedAppUsage
++    @RequiresPermission(android.Manifest.permission.MODIFY_AUDIO_ROUTING)
++    public ArrayList<AppVolume> listAppVolumes() {
++        ArrayList<AppVolume> volumes = new ArrayList<AppVolume>();
++        int status = AudioSystem.listAppVolumes(volumes);
++        if (status != AudioManager.SUCCESS) {
++            return new ArrayList<AppVolume>();
++        }
++        return volumes;
++    }
++
+     /**
+      * Returns the current ringtone mode.
+      *
+diff --git a/media/java/android/media/AudioSystem.java b/media/java/android/media/AudioSystem.java
+index 955bfcc902a4..9d2ba973c6de 100644
+--- a/media/java/android/media/AudioSystem.java
++++ b/media/java/android/media/AudioSystem.java
+@@ -1749,6 +1749,13 @@ public class AudioSystem
+         return sb.toString();
+     }
+ 
++    /** @hide */
++    public static native int setAppVolume(@NonNull String packageName, float volume);
++    /** @hide */
++    public static native int setAppMute(@NonNull String packageName, boolean mute);
++    /** @hide */
++    public static native int listAppVolumes(ArrayList<AppVolume> volumes);
++    
+     /**
+      * @hide
+      * Do not use directly, see {@link AudioManager#getDevicesForAttributes(AudioAttributes)}
+diff --git a/packages/SystemUI/res/drawable/ic_app_volume.xml b/packages/SystemUI/res/drawable/ic_app_volume.xml
+new file mode 100644
+index 000000000000..0345ad5c8c4d
+--- /dev/null
++++ b/packages/SystemUI/res/drawable/ic_app_volume.xml
+@@ -0,0 +1,16 @@
++<vector
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:width="24dp"
++    android:height="24dp"
++    android:viewportWidth="24"
++    android:viewportHeight="24"
++    android:tint="?attr/colorControlNormal">
++    <path
++        android:pathData="M 10.001 3 C 9.448 3 9 3.448 9.001 4.001 L 9.01 13.55 C 8.41 13.21 7.73 13 7.01 13 C 4.79 13 3 14.79 3 17 C 3 19.21 4.79 21 7.01 21 C 9.23 21 11 19.21 11 17 L 11 7 L 14 7 C 14.552 7 15 6.552 15 6 L 15 4 C 15 3.448 14.552 3 14 3 L 10.001 3 Z"
++        android:fillColor="@android:color/white"
++        android:strokeWidth="1"/>
++    <path
++        android:pathData="M 14 10 L 15 10 C 15.265 10 15.52 10.105 15.707 10.293 C 15.895 10.48 16 10.735 16 11 L 16 12 C 16 12.265 15.895 12.52 15.707 12.707 C 15.52 12.895 15.265 13 15 13 L 14 13 C 13.735 13 13.48 12.895 13.293 12.707 C 13.105 12.52 13 12.265 13 12 L 13 11 C 13 10.735 13.105 10.48 13.293 10.293 C 13.48 10.105 13.735 10 14 10 M 14 15 L 15 15 C 15.265 15 15.52 15.105 15.707 15.293 C 15.895 15.48 16 15.735 16 16 L 16 17 C 16 17.265 15.895 17.52 15.707 17.707 C 15.52 17.895 15.265 18 15 18 L 14 18 C 13.735 18 13.48 17.895 13.293 17.707 C 13.105 17.52 13 17.265 13 17 L 13 16 C 13 15.735 13.105 15.48 13.293 15.293 C 13.48 15.105 13.735 15 14 15 M 19 10 L 20 10 C 20.265 10 20.52 10.105 20.707 10.293 C 20.895 10.48 21 10.735 21 11 L 21 12 C 21 12.265 20.895 12.52 20.707 12.707 C 20.52 12.895 20.265 13 20 13 L 19 13 C 18.735 13 18.48 12.895 18.293 12.707 C 18.105 12.52 18 12.265 18 12 L 18 11 C 18 10.735 18.105 10.48 18.293 10.293 C 18.48 10.105 18.735 10 19 10 M 19 15 L 20 15 C 20.265 15 20.52 15.105 20.707 15.293 C 20.895 15.48 21 15.735 21 16 L 21 17 C 21 17.265 20.895 17.52 20.707 17.707 C 20.52 17.895 20.265 18 20 18 L 19 18 C 18.735 18 18.48 17.895 18.293 17.707 C 18.105 17.52 18 17.265 18 17 L 18 16 C 18 15.735 18.105 15.48 18.293 15.293 C 18.48 15.105 18.735 15 19 15"
++        android:fillColor="@android:color/white"
++        android:strokeWidth="1"/>
++</vector>
+diff --git a/packages/SystemUI/res/drawable/volume_background.xml b/packages/SystemUI/res/drawable/volume_background.xml
+new file mode 100644
+index 000000000000..b43534f55d1b
+--- /dev/null
++++ b/packages/SystemUI/res/drawable/volume_background.xml
+@@ -0,0 +1,22 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++    Copyright (C) 2022 Project Kaleidoscope
++    
++    Licensed under the Apache License, Version 2.0 (the "License");
++    you may not use this file except in compliance with the License.
++    You may obtain a copy of the License at
++    
++         http://www.apache.org/licenses/LICENSE-2.0
++         
++    Unless required by applicable law or agreed to in writing, software
++    distributed under the License is distributed on an "AS IS" BASIS,
++    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++    See the License for the specific language governing permissions and
++    limitations under the License.
++-->
++
++<shape xmlns:android="http://schemas.android.com/apk/res/android"
++       xmlns:androidprv="http://schemas.android.com/apk/prv/res/android">
++    <size android:width="@dimen/volume_dialog_panel_width" />
++    <solid android:color="?androidprv:attr/colorSurface" />
++</shape>
+diff --git a/packages/SystemUI/res/layout-land/volume_dialog.xml b/packages/SystemUI/res/layout-land/volume_dialog.xml
+index e42c51520a0e..3204eb7008fd 100644
+--- a/packages/SystemUI/res/layout-land/volume_dialog.xml
++++ b/packages/SystemUI/res/layout-land/volume_dialog.xml
+@@ -95,6 +95,24 @@
+                     android:orientation="horizontal">
+                     <!-- volume rows added and removed here! :-) -->
+                 </LinearLayout>
++                <FrameLayout
++                    android:id="@+id/app_volume_container"
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:background="@drawable/volume_background"
++                    android:paddingLeft="@dimen/volume_dialog_ringer_rows_padding"
++                    android:paddingRight="@dimen/volume_dialog_ringer_rows_padding">
++                    <com.android.keyguard.AlphaOptimizedImageButton
++                        android:id="@+id/app_volume"
++                        android:src="@drawable/ic_app_volume"
++                        android:layout_width="@dimen/volume_dialog_tap_target_size"
++                        android:layout_height="@dimen/volume_dialog_tap_target_size"
++                        android:layout_gravity="center"
++                        android:contentDescription="@string/accessibility_volume_settings"
++                        android:background="@drawable/ripple_drawable_20dp"
++                        android:tint="?androidprv:attr/colorAccent"
++                        android:soundEffectsEnabled="false" />
++                </FrameLayout>
+                 <FrameLayout
+                     android:id="@+id/settings_container"
+                     android:layout_width="wrap_content"
+diff --git a/packages/SystemUI/res/layout/volume_dialog.xml b/packages/SystemUI/res/layout/volume_dialog.xml
+index 933dee5a402f..839b76e464d2 100644
+--- a/packages/SystemUI/res/layout/volume_dialog.xml
++++ b/packages/SystemUI/res/layout/volume_dialog.xml
+@@ -94,6 +94,24 @@
+                     android:orientation="horizontal">
+                         <!-- volume rows added and removed here! :-) -->
+                 </LinearLayout>
++                <FrameLayout
++                    android:id="@+id/app_volume_container"
++                    android:layout_width="wrap_content"
++                    android:layout_height="wrap_content"
++                    android:background="@drawable/volume_background"
++                    android:paddingLeft="@dimen/volume_dialog_ringer_rows_padding"
++                    android:paddingRight="@dimen/volume_dialog_ringer_rows_padding">
++                    <com.android.keyguard.AlphaOptimizedImageButton
++                        android:id="@+id/app_volume"
++                        android:src="@drawable/ic_app_volume"
++                        android:layout_width="@dimen/volume_dialog_tap_target_size"
++                        android:layout_height="@dimen/volume_dialog_tap_target_size"
++                        android:layout_gravity="center"
++                        android:contentDescription="@string/accessibility_volume_settings"
++                        android:background="@drawable/ripple_drawable_20dp"
++                        android:tint="?androidprv:attr/colorAccent"
++                        android:soundEffectsEnabled="false" />
++                </FrameLayout>
+                 <FrameLayout
+                     android:id="@+id/settings_container"
+                     android:layout_width="wrap_content"
+diff --git a/packages/SystemUI/src/com/android/systemui/volume/VolumeDialogImpl.java b/packages/SystemUI/src/com/android/systemui/volume/VolumeDialogImpl.java
+index 3d665814eb1c..09a1ed9813ca 100644
+--- a/packages/SystemUI/src/com/android/systemui/volume/VolumeDialogImpl.java
++++ b/packages/SystemUI/src/com/android/systemui/volume/VolumeDialogImpl.java
+@@ -63,6 +63,7 @@ import android.graphics.drawable.ColorDrawable;
+ import android.graphics.drawable.Drawable;
+ import android.graphics.drawable.LayerDrawable;
+ import android.graphics.drawable.RotateDrawable;
++import android.media.AppVolume;
+ import android.media.AudioManager;
+ import android.media.AudioSystem;
+ import android.os.Debug;
+@@ -111,6 +112,7 @@ import com.android.internal.graphics.drawable.BackgroundBlurDrawable;
+ import com.android.internal.jank.InteractionJankMonitor;
+ import com.android.internal.view.RotationPolicy;
+ import com.android.settingslib.Utils;
++import com.android.systemui.Dependency;
+ import com.android.systemui.Prefs;
+ import com.android.systemui.R;
+ import com.android.systemui.animation.Interpolators;
+@@ -236,6 +238,8 @@ public class VolumeDialogImpl implements VolumeDialog,
+     private CaptionsToggleImageButton mODICaptionsIcon;
+     private View mSettingsView;
+     private ImageButton mSettingsIcon;
++    private View mAppVolumeView;
++    private ImageButton mAppVolumeIcon;
+     private FrameLayout mZenIcon;
+     private final List<VolumeRow> mRows = new ArrayList<>();
+     private ConfigurableTexts mConfigurableTexts;
+@@ -592,6 +596,9 @@ public class VolumeDialogImpl implements VolumeDialog,
+         mSettingsIcon = mDialog.findViewById(R.id.settings);
+ 
+         mRoundedBorderBottom = mDialog.findViewById(R.id.rounded_border_bottom);
++        
++        mAppVolumeView = mDialog.findViewById(R.id.app_volume_container);
++        mAppVolumeIcon = mDialog.findViewById(R.id.app_volume);
+ 
+         if (mVolumePanelOnLeft) {
+             if (mRingerAndDrawerContainer != null) {
+@@ -648,6 +655,7 @@ public class VolumeDialogImpl implements VolumeDialog,
+         updateRowsH(getActiveRow());
+         initRingerH();
+         initSettingsH(lockTaskModeState);
++        initAppVolumeH();
+         initODICaptionsH();
+     }
+ 
+@@ -1147,6 +1155,39 @@ public class VolumeDialogImpl implements VolumeDialog,
+         }
+     }
+ 
++    private boolean shouldShowAppVolume() {
++        ContentResolver cr = mContext.getContentResolver();
++        int showAppVolume = Settings.System.getInt(cr, Settings.System.SHOW_APP_VOLUME, 0);
++        boolean ret = showAppVolume == 1;
++        if (ret) {
++            ret = false;
++            AudioManager audioManager = mController.getAudioManager();
++            for (AppVolume av : audioManager.listAppVolumes()) {
++                if (av.isActive()) {
++                    ret = true;
++            break;
++                }
++            }
++        }
++        return ret;
++    }
++
++    public void initAppVolumeH() {
++        if (mAppVolumeView != null) {
++            mAppVolumeView.setVisibility(shouldShowAppVolume() ? VISIBLE : GONE);
++        }
++        if (mAppVolumeIcon != null) {
++            mAppVolumeIcon.setOnClickListener(v -> {
++                Events.writeEvent(Events.EVENT_SETTINGS_CLICK);
++                Intent intent = new Intent(Settings.Panel.ACTION_APP_VOLUME);
++                dismissH(DISMISS_REASON_SETTINGS_CLICKED);
++                Dependency.get(MediaOutputDialogFactory.class).dismiss();
++                Dependency.get(ActivityStarter.class).startActivity(intent,
++                        true /* dismissShade */);
++            });
++        }
++    }
++
+     public void initRingerH() {
+         if (mRingerIcon != null) {
+             mRingerIcon.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);
+@@ -1409,6 +1450,7 @@ public class VolumeDialogImpl implements VolumeDialog,
+         }
+ 
+         initSettingsH(lockTaskModeState);
++        initAppVolumeH();
+         mShowing = true;
+         mIsAnimatingDismiss = false;
+         mDialog.show();
+-- 
+2.32.0
+
