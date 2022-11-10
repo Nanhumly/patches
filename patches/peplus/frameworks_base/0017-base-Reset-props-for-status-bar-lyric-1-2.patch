@@ -1,0 +1,158 @@
+From 037e0fd9a818ecae642eb40604f9f148fde99162 Mon Sep 17 00:00:00 2001
+From: cjybyjk <cjybyjk@zjnu.edu.cn>
+Date: Sat, 30 Jul 2022 22:13:54 +0800
+Subject: [PATCH] base: Reset props for status bar lyric [1/2]
+
+Reset props to Meizu in some apps to use status bar lyric
+
+Signed-off-by: cjybyjk <cjybyjk@zjnu.edu.cn>
+Change-Id: Idd573836af184b95ab0275f81fcb7ae3057783b9
+---
+ core/java/android/app/Instrumentation.java    | 10 +++
+ .../internal/util/custom/MeizuPropsUtils.java | 85 +++++++++++++++++++
+ 2 files changed, 95 insertions(+)
+ create mode 100644 core/java/com/android/internal/util/custom/MeizuPropsUtils.java
+
+diff --git a/core/java/android/app/Instrumentation.java b/core/java/android/app/Instrumentation.java
+index 8db3981f012e..1ca59e8b07ee 100644
+--- a/core/java/android/app/Instrumentation.java
++++ b/core/java/android/app/Instrumentation.java
+@@ -41,6 +41,7 @@ import android.os.Process;
+ import android.os.RemoteException;
+ import android.os.ServiceManager;
+ import android.os.SystemClock;
++import android.os.SystemProperties;
+ import android.os.TestLooperManager;
+ import android.os.UserHandle;
+ import android.util.AndroidRuntimeException;
+@@ -65,6 +66,7 @@ import java.util.List;
+ import java.util.concurrent.TimeoutException;
+ 
+ import com.android.internal.util.custom.PixelPropsUtils;
++import com.android.internal.util.custom.MeizuPropsUtils;
+ 
+ /**
+  * Base class for implementing application instrumentation code.  When running
+@@ -94,6 +96,8 @@ public class Instrumentation {
+     private static final String TAG = "Instrumentation";
+ 
+     private static final long CONNECT_TIMEOUT_MILLIS = 5000;
++    
++    private static final String DISGUISE_PROPS_FOR_MUSIC_APP = "persist.sys.disguise_props_for_music_app";
+ 
+     /**
+      * @hide
+@@ -1235,6 +1239,9 @@ public class Instrumentation {
+         app.attach(context);
+         String packageName = context.getPackageName();
+         PixelPropsUtils.setProps(packageName);
++        if (SystemProperties.getBoolean(DISGUISE_PROPS_FOR_MUSIC_APP, false)) {
++            MeizuPropsUtils.setProps(packageName);
++        }
+         return app;
+     }
+     
+@@ -1254,6 +1261,9 @@ public class Instrumentation {
+         app.attach(context);
+         String packageName = context.getPackageName();
+         PixelPropsUtils.setProps(packageName);
++        if (SystemProperties.getBoolean(DISGUISE_PROPS_FOR_MUSIC_APP, false)) {
++            MeizuPropsUtils.setProps(packageName);
++        }
+         return app;
+     }
+ 
+diff --git a/core/java/com/android/internal/util/custom/MeizuPropsUtils.java b/core/java/com/android/internal/util/custom/MeizuPropsUtils.java
+new file mode 100644
+index 000000000000..3d2642707499
+--- /dev/null
++++ b/core/java/com/android/internal/util/custom/MeizuPropsUtils.java
+@@ -0,0 +1,85 @@
++/*
++ * Copyright (C) 2020 The Pixel Experience Project
++ *               2020 The exTHmUI Open Source Project
++ *               2022 Project Kaleidoscope
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package com.android.internal.util.custom;
++
++import android.os.Build;
++import android.util.Log;
++
++import java.util.Arrays;
++import java.lang.reflect.Field;
++import java.util.HashMap;
++import java.util.Map;
++
++public class MeizuPropsUtils {
++
++    private static final String TAG = MeizuPropsUtils.class.getSimpleName();
++    private static final boolean DEBUG = false;
++
++    private static final Map<String, Object> propsToChange;
++
++    private static final String[] packagesToChange = {
++        "com.netease.cloudmusic",
++        "com.tencent.qqmusic",
++        "com.kugou.android",
++        "com.kugou.android.lite",
++        "cmccwm.mobilemusic",
++        "cn.kuwo.player",
++        "com.meizu.media.music"
++    };
++
++    static {
++        propsToChange = new HashMap<>();
++        propsToChange.put("BRAND", "meizu");
++        propsToChange.put("MANUFACTURER", "Meizu");
++        propsToChange.put("DEVICE", "meizu18");
++        propsToChange.put("DISPLAY","Flyme");
++        propsToChange.put("PRODUCT","meizu_18_CN");
++        propsToChange.put("MODEL", "MEIZU 18");
++        propsToChange.put("FINGERPRINT", "meizu/meizu_18_CN/meizu18:11/RKQ1.201105.002/1607588916:user/release-keys");
++    }
++
++    public static void setProps(String packageName) {
++        if (packageName == null){
++            return;
++        }
++        if (Arrays.asList(packagesToChange).contains(packageName)){
++            if (DEBUG){
++                Log.d(TAG, "Defining props for: " + packageName);
++            }
++            for (Map.Entry<String, Object> prop : propsToChange.entrySet()) {
++                String key = prop.getKey();
++                Object value = prop.getValue();
++                setPropValue(key, value);
++            }
++        }
++    }
++
++    private static void setPropValue(String key, Object value){
++        try {
++            if (DEBUG){
++                Log.d(TAG, "Defining prop " + key + " to " + value.toString());
++            }
++            Field field = Build.class.getDeclaredField(key);
++            field.setAccessible(true);
++            field.set(null, value);
++            field.setAccessible(false);
++        } catch (NoSuchFieldException | IllegalAccessException e) {
++            Log.e(TAG, "Failed to set prop " + key, e);
++        }
++    }
++}
+-- 
+2.32.0
+

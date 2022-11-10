@@ -1,0 +1,141 @@
+From 49c873f5065f25d53c291a789c8abb4582a007a8 Mon Sep 17 00:00:00 2001
+From: cjybyjk <cjybyjk@zjnu.edu.cn>
+Date: Mon, 1 Aug 2022 22:29:54 +0800
+Subject: [PATCH] preference: add SystemPropertySwitchPreference
+
+Signed-off-by: cjybyjk <cjybyjk@zjnu.edu.cn>
+Change-Id: Idf11c6b117fa47d1c9d8d64adacfd3003a91008f
+---
+ .../preference/SystemPropertiesStore.java     | 60 +++++++++++++++++++
+ .../SystemPropertySwitchPreference.java       | 52 ++++++++++++++++
+ 2 files changed, 112 insertions(+)
+ create mode 100644 src/com/android/settings/custom/preference/SystemPropertiesStore.java
+ create mode 100644 src/com/android/settings/custom/preference/SystemPropertySwitchPreference.java
+
+diff --git a/src/com/android/settings/custom/preference/SystemPropertiesStore.java b/src/com/android/settings/custom/preference/SystemPropertiesStore.java
+new file mode 100644
+index 0000000..6456cdc
+--- /dev/null
++++ b/src/com/android/settings/custom/preference/SystemPropertiesStore.java
+@@ -0,0 +1,60 @@
++/*
++ * Copyright (C) 2022 Project Kaleidoscope
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.settings.custom.preference;
++
++import android.os.SystemProperties;
++import android.preference.PreferenceDataStore;
++
++public class SystemPropertiesStore extends androidx.preference.PreferenceDataStore
++        implements PreferenceDataStore {
++
++    public SystemPropertiesStore() {
++    }
++
++    public boolean getBoolean(String key, boolean defValue) {
++        return SystemProperties.getBoolean(key, defValue);
++    }
++
++    public int getInt(String key, int defValue) {
++        return SystemProperties.getInt(key, defValue);
++    }
++
++    public long getLong(String key, long defValue) {
++        return SystemProperties.getLong(key, defValue);
++    }
++
++    public String getString(String key, String defValue) {
++        return SystemProperties.get(key, defValue);
++    }
++
++    public void putBoolean(String key, boolean value) {
++        putString(key, value ? "1" : "0");
++    }
++
++    public void putInt(String key, int value) {
++        putString(key, Integer.toString(value));
++    }
++
++    public void putLong(String key, long value) {
++        putString(key, Long.toString(value));
++    }
++
++    public void putString(String key, String value) {
++        SystemProperties.set(key, value);
++    }
++
++}
+diff --git a/src/com/android/settings/custom/preference/SystemPropertySwitchPreference.java b/src/com/android/settings/custom/preference/SystemPropertySwitchPreference.java
+new file mode 100644
+index 0000000..6140253
+--- /dev/null
++++ b/src/com/android/settings/custom/preference/SystemPropertySwitchPreference.java
+@@ -0,0 +1,52 @@
++/*
++ * Copyright (C) 2014 The CyanogenMod Project
++ * Copyright (C) 2017 AICP
++ * Copyright (C) 2022 Project Kaleidoscope
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ * http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.settings.custom.preference;
++
++import android.content.Context;
++import androidx.preference.SwitchPreference;
++import android.util.AttributeSet;
++
++public class SystemPropertySwitchPreference extends SwitchPreference {
++
++    public SystemPropertySwitchPreference(Context context, AttributeSet attrs, int defStyle) {
++        super(context, attrs, defStyle);
++        setPreferenceDataStore(new SystemPropertiesStore());
++    }
++
++    public SystemPropertySwitchPreference(Context context, AttributeSet attrs) {
++        super(context, attrs);
++        setPreferenceDataStore(new SystemPropertiesStore());
++    }
++
++    public SystemPropertySwitchPreference(Context context) {
++        super(context);
++        setPreferenceDataStore(new SystemPropertiesStore());
++    }
++
++    @Override
++    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
++        // This is what default TwoStatePreference implementation is doing without respecting
++        // real default value:
++        //setChecked(restoreValue ? getPersistedBoolean(mChecked)
++        //        : (Boolean) defaultValue);
++        // Instead, we better do
++        setChecked(restoreValue ? getPersistedBoolean((Boolean) defaultValue)
++                : (Boolean) defaultValue);
++    }
++}
+-- 
+2.32.0
+
