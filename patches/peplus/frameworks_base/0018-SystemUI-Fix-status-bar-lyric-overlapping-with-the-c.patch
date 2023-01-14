@@ -1,0 +1,48 @@
+From a052951ae9df2837006f8f9e904cc7260841c5f7 Mon Sep 17 00:00:00 2001
+From: LibXZR <i@xzr.moe>
+Date: Wed, 14 Sep 2022 12:07:42 +0800
+Subject: [PATCH 4/4] SystemUI: Fix status bar lyric overlapping with the center
+ clock
+
+Change-Id: I8a058e1239d504f92ed811e528cff2077444a8d2
+Signed-off-by: LibXZR <i@xzr.moe>
+---
+ .../statusbar/phone/fragment/CollapsedStatusBarFragment.java  | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/CollapsedStatusBarFragment.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/CollapsedStatusBarFragment.java
+index 065a8d90be1f..e4d2cbb2dfd5 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/CollapsedStatusBarFragment.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/fragment/CollapsedStatusBarFragment.java
+@@ -763,10 +763,12 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
+ 
+     private class LyricController extends LyricViewController {
+         private View mStartSide;
++        private View mCenteredArea;
+ 
+         public LyricController(Context context, View statusBar) {
+             super(context, statusBar);
+             mStartSide = statusBar.findViewById(R.id.status_bar_start_side_except_heads_up);
++            mCenteredArea = statusBar.findViewById(R.id.centered_area);
+         }
+ 
+         public void showLyricView(boolean animate) {
+@@ -774,6 +776,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
+             boolean hasOngoingCall = (mDisabled1 & DISABLE_ONGOING_CALL_CHIP) == 0;
+             if (!disableNotifications && !hasOngoingCall && isLyricStarted()) {
+                 animateHide(mStartSide, animate);
++                animateHide(mCenteredArea, animate);
+                 animateShow(getView(), animate);
+             }
+         }
+@@ -781,6 +784,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
+         public void hideLyricView(boolean animate) {
+             animateHide(getView(), animate);
+             animateShow(mStartSide, animate);
++            animateShow(mCenteredArea, animate);
+ 	    }
+     }
+ }
+-- 
+2.32.0
+

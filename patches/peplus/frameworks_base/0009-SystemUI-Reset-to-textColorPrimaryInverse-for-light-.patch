@@ -1,0 +1,30 @@
+From f37694b3fe6461b73b5855ec3201fc9cc50d431e Mon Sep 17 00:00:00 2001
+From: Xayah <zds1249475336@gmail.com>
+Date: Fri, 19 Aug 2022 13:46:08 -0400
+Subject: [PATCH 09/12] SystemUI: Reset to textColorPrimaryInverse for light
+ theme
+
+* Most of them have been replaced with textColorOnAccent in b1444e4dc126357a79acb2e8e8e5e8d8578cf326, which is not in harmony with light theme.
+
+Change-Id: I72a3a33e4e4a4fc9f23458d2c0000ca4c3fbae7d
+---
+ packages/SystemUI/res-keyguard/layout/footer_actions.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/packages/SystemUI/res-keyguard/layout/footer_actions.xml b/packages/SystemUI/res-keyguard/layout/footer_actions.xml
+index 1ce106ed2156..a101c64a48e0 100644
+--- a/packages/SystemUI/res-keyguard/layout/footer_actions.xml
++++ b/packages/SystemUI/res-keyguard/layout/footer_actions.xml
+@@ -95,7 +95,7 @@
+             android:padding="@dimen/qs_footer_icon_padding"
+             android:src="@*android:drawable/ic_lock_power_off"
+             android:contentDescription="@string/accessibility_quick_settings_power_menu"
+-            android:tint="?androidprv:attr/textColorOnAccent" />
++            android:tint="?androidprv:attr/textColorPrimaryInverse" />
+ 
+     </LinearLayout>
+ </com.android.systemui.qs.FooterActionsView>
+\ No newline at end of file
+-- 
+2.32.0
+
